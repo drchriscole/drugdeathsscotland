@@ -27,6 +27,6 @@ ggplot(dat.m, aes(x=Year, y=value, group=Age, colour=Age)) +
   geom_hline(yintercept = yr5mean, colour="#990000", linetype="dashed") + 
   geom_line(size=1.2) + 
   ylab("Deaths per 1000 population") + 
-  annotate("text", label="Mean 2013-2017", x=16.3,y=yr5mean-0.015,size=3,colour="#990000") +
+  annotate("text", label="Mean 2013-2017", x=16.8,y=yr5mean-0.015,size=3,colour="#990000") +
   scale_x_discrete(breaks=seq(2000,2016,2)) + 
   ggtitle("Scotland Drug-Related Deaths")
