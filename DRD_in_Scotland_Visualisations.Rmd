@@ -1,7 +1,6 @@
 ---
 title: "Drug Related Deaths in Scotland 2017"
 author: "Christian Cole"
-date: "12/07/2019"
 output: html_document
 ---
 
@@ -17,13 +16,49 @@ library(tibble)
 reg.colours = c("#4D4D4D", "#AEAEAE")
 
 # The colour-blind palette with grey:
-cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+myPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
 # read data - download first as read_excel() can't do URLs
 xlfile = tempfile(fileext = '.xlsx')
 download.file("https://www.nrscotland.gov.uk/files//statistics/drug-related-deaths/17/drug-related-deaths-17-tabs-figs.xlsx", xlfile, mode="wb")
 
 ```
+
+## Tab {.tabset}
+
+### Table 2
+
+```{r t2}
+# read data
+table8.dat = read_excel(xlfile, sheet = 4, col_names=FALSE)
+
+# extract core data and convert to numbers
+dat = table8.dat[36:43,c(1,3:7)]
+dat = data.frame(apply(dat, 2, as.numeric))
+
+# add colnames
+colnames(dat) <- c('Year','Drug Abuse','Accidental Poisoning','Suicide','Assault by Drugs','Undetermined')
+
+# remove averages row and save
+mean13.17 = dat[8,]
+dat = dat[-8,]
+dat$Year <- factor(dat$Year)
+dat.m = melt(dat)
+
+ggplot(dat.m, aes(x=Year, y=value, fill=variable)) + 
+  ggtitle("Underlying Cause of Death") +
+  ylab("No. Deaths") +
+  geom_col() +
+  scale_fill_manual(values = myPalette) +
+  theme_minimal() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.title = element_blank())
+
+```
+
+
+### Table 8
 
 ```{r t8}
 # read data
@@ -49,7 +84,7 @@ ggplot(dat.m, aes(x=Year, y=value, group=Age, colour=Age)) +
   ylab("Deaths per 1000 population") + 
   annotate("text", label="Mean 2013-2017", x=16.8,y=yr5mean-0.015,size=3,colour="grey") +
   scale_x_discrete(breaks=seq(2000,2016,2)) + 
-  scale_color_brewer(palette=cbPalette) +
+  scale_color_manual(values=myPalette) +
   ggtitle("Death Rates by Age") +
   theme_minimal() +
   theme(panel.grid.major.x = element_blank(),
