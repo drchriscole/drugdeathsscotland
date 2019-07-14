@@ -11,6 +11,7 @@ library(readxl)
 library(reshape2)
 library(ggplot2)
 library(tibble)
+library(dplyr)
 
 # default region colours
 reg.colours = c("#4D4D4D", "#AEAEAE")
@@ -43,11 +44,11 @@ colnames(dat) <- c('Year','Drug Abuse','Accidental Poisoning','Suicide','Assault
 mean13.17 = dat[8,]
 dat = dat[-8,]
 
-year.totals = dat.m %>% group_by(Year) %>% summarise(Total = sum(value))
-
 # factorise the years to turn into a label and melt
 dat$Year <- factor(dat$Year)
 dat.m = melt(dat)
+
+year.totals = dat.m %>% group_by(Year) %>% summarise(Total = sum(value))
 
 ggplot(dat.m, aes(x=Year, y=value, fill=variable)) + 
   ggtitle("Underlying Cause of Death") +
@@ -64,41 +65,67 @@ ggplot(dat.m, aes(x=Year, y=value, fill=variable)) +
 
 ### Table 3
 
-```{r t3}
+```{r t3, fig.width=7}
 # read data
 table.dat = read_excel(xlfile, sheet = 5, col_names=FALSE)
 
 # extract core data and convert to numbers
-dat = table.dat[23:32,c(1,3:14)]
+dat = table.dat[15:32,c(1,3:14)]
 dat = data.frame(apply(dat, 2, as.numeric))
 
 colnames(dat) <- c('Year','Heroin/morphine','Methodone','Heroin or OST','Codeine', 'Dihydrocodeine', 'Any opiate', 'Any benzodiazepine', 'Diazepam', 'Cocaine', 'Ecstasy', 'Amphetamines', 'Alcohol')
 
-# heroin or OST and any opiate are not very informative
-# as they're just a combination of the others (accounting for
-# individual cases)
-dat = dat[,-7]
-dat = dat[,-4]
-
 # combine the codeine/dihydrocodeine cols and remove
 dat = data.frame(dat, Codeines = dat$Codeine + dat$Dihydrocodeine)
-dat = dat[,-5]
-dat = dat[,-4]
 
-opiates = dat[,c(1:3,10)]
+# subtract the diazepam data from 
+# the any benzo data to make an "other benzo" column
+dat = data.frame(dat, "Other benzodiazepines"=dat$Any.benzodiazepine - dat$Diazepam)
+
+# remove uninterest columns:
+#   heroin or OST and any opiate are not very informative
+#   Codeine/dihydrocodeine unnecessary now as they've been combined
+#   any benzo is superceded by other benzos
+# individual cases)
+dat = dat[,c(1:3,9:15)]
+
+opiates = dat[,c(1:4,9:10)]
+others = dat[,c(1,5:8)]
 
 # factorise the years to turn into a label and melt
-dat$Year <- factor(dat$Year)
-dat.m = melt(dat)
+opiates$Year <- factor(opiates$Year)
+opiates.m = melt(opiates)
 
-ggplot(dat.m, aes(x=Year, y=value, group=variable, colour=variable)) +
-  ggtitle("Drugs Implicated in Death", subtitle = 'Opiates') +
+ggplot(opiates.m, aes(x=Year, y=value, group=variable, colour=variable)) +
+  ggtitle("Drugs Implicated in Death", subtitle = 'Opiates and benzodiazepines') +
   ylab("No. of Deaths") +
+  ylim(c(0,500)) +
+  geom_vline(xintercept=which(opiates$Year == '2008'), colour="grey", linetype="dashed") +
   geom_line(size=1.1) +
-  #scale_color_manual(values = myPalette) +
+  scale_color_manual(values = myPalette, labels = c('Heroine or Morphine','Methadone','Diazepam','Codeines','Other\nbenzodiazepines')) +
+  scale_x_discrete(breaks = seq(2000,2016,2)) +
   theme_minimal() +
   theme(panel.grid.major.x = element_blank(),
-        panel.grid.minor = element_blank())
+        panel.grid.minor.x = element_blank(),
+        legend.title = element_blank())
+
+# factorise the years to turn into a label and melt
+others$Year <- factor(others$Year)
+others.m = melt(others)
+
+ggplot(others.m, aes(x=Year, y=value, group=variable, colour=variable)) +
+  ggtitle("Drugs Implicated in Death", subtitle = 'Others') +
+  ylab("No. of Deaths") +
+  ylim(c(0,500)) +
+  geom_vline(xintercept=which(opiates$Year == '2008'), colour="grey", linetype="dashed") +
+  geom_line(size=1.1) +
+  scale_color_manual(values = myPalette) +
+  scale_x_discrete(breaks = seq(2000,2016,2)) +
+  theme_minimal() +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        legend.title = element_blank())
+
 
 ```
 
