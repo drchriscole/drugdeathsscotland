@@ -129,6 +129,55 @@ ggplot(others.m, aes(x=Year, y=value, group=variable, colour=variable)) +
 
 ```
 
+### Table 4
+
+```{r t4a}
+# read data
+table.dat = read_excel(xlfile, sheet = 6, col_names=FALSE)
+
+# extract core data and convert to numbers  there are some 
+# columns used as fillers. Gah!
+dat = table.dat[14:31,c(1,2,4,5,7:13,15:17)]
+dat = data.frame(apply(dat, 2, as.numeric))
+
+colnames(dat) <- c('Year','all','male','female','u14','15_24','25_34','35_44','45_54','55_64','o65','lq','median','uq')
+
+ggplot(dat, aes(x=Year, y=median)) + 
+  ggtitle("Median Age at Death") +
+  ylab("Age") +
+  geom_line() +
+  ylim(c(0,50)) +
+  stat_summary(ymin=dat$lq, ymax=dat$uq, geom="ribbon", alpha=0.2, fill='red') +
+  scale_x_continuous(breaks = seq(2000,2017,2)) +
+  theme_minimal() +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        legend.title = element_blank())
+```
+
+Shaded area represents the lower to upper quartile range of ages.
+
+```{r t4b}
+# calc percentage female deaths
+dat = data.frame(dat, fempc = 100*dat$female/dat$all, malpc = 100*dat$male/dat$all)
+
+dat$Year = factor(dat$Year)
+dat.sex = dat[,c('Year','fempc','malpc')]
+dat.sex.m = melt(dat.sex)
+
+ggplot(dat.sex.m, aes(x=Year, y=value, group=variable, colour=variable)) + 
+  ggtitle("Percentage of Male vs Female Deaths") +
+  ylab("Percentage Deaths") +
+  geom_line() +
+  ylim(c(10,90)) +
+  scale_color_discrete(name='Sex', breaks=c('malpc','fempc'),labels=c('Male','Female')) +
+  scale_x_discrete(breaks = seq(2000,2017,2)) +
+  theme_minimal() +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        legend.title = element_blank())
+```
+
 
 ### Table 8
 
