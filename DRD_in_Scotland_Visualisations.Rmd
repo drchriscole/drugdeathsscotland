@@ -131,6 +131,8 @@ ggplot(others.m, aes(x=Year, y=value, group=variable, colour=variable)) +
 
 ### Table 4
 
+Table 4 describes quite a lot of data represented in different ways. Each is presented as a different plot.
+
 ```{r t4a}
 # read data
 table.dat = read_excel(xlfile, sheet = 6, col_names=FALSE)
@@ -143,7 +145,7 @@ dat = data.frame(apply(dat, 2, as.numeric))
 colnames(dat) <- c('Year','all','male','female','u14','15_24','25_34','35_44','45_54','55_64','o65','lq','median','uq')
 
 ggplot(dat, aes(x=Year, y=median)) + 
-  ggtitle("Median Age at Death") +
+  ggtitle("Median Age at Death", subtitle = 'Shaded area represents the lower to upper quartile range of ages.') +
   ylab("Age") +
   geom_line() +
   ylim(c(0,50)) +
@@ -155,10 +157,12 @@ ggplot(dat, aes(x=Year, y=median)) +
         legend.title = element_blank())
 ```
 
-Shaded area represents the lower to upper quartile range of ages.
+
+
+Median age of drug-related death is increasing from 30 in 2000 to 41 in 2017.
 
 ```{r t4b}
-# calc percentage female deaths
+# calc percentage m/f deaths
 dat = data.frame(dat, fempc = 100*dat$female/dat$all, malpc = 100*dat$male/dat$all)
 
 dat$Year = factor(dat$Year)
@@ -178,6 +182,64 @@ ggplot(dat.sex.m, aes(x=Year, y=value, group=variable, colour=variable)) +
         legend.title = element_blank())
 ```
 
+Males are mostly affected by drug-related deaths, but females are increasing.
+
+```{r t4c}
+## get data from lower table
+
+calc_percent <- function(x) {
+  year = x[1]
+  x = x[-1]
+  total = sum(x)
+  pc.x = round(100*x/total,2)
+  return(c(year, pc.x))
+}
+
+# read data
+table.dat = read_excel(xlfile, sheet = 6, col_names=FALSE)
+
+# extract male data and convert to numbers  there are some 
+# columns used as fillers. Gah!
+mdat = table.dat[40:57,c(1,4,5,7:9)]
+mdat = data.frame(apply(mdat, 2, as.numeric))
+
+# turn into percentages
+mdat = data.frame(t(apply(mdat,1,calc_percent)))
+colnames(mdat) <- c('Year','u24','25-34','35-44','45-54','o55')
+
+# extract female data and convert to numbers  there are some 
+# columns used as fillers. Gah!
+fdat = table.dat[40:57,c(1,12:13,15:17)]
+fdat = data.frame(apply(fdat, 2, as.numeric))
+
+# turn into percentages
+fdat = data.frame(t(apply(fdat,1,calc_percent)))
+colnames(fdat) <- c('Year','u24','25-34','35-44','45-54','o55')
+
+dat = rbind(mdat,fdat)
+
+dat = data.frame(dat, Sex=rep(c('Male','Female'),each=nrow(mdat)))
+
+dat$Year = factor(dat$Year)
+dat.m = melt(dat)
+
+ggplot(dat.m, aes(x=Year, y=value, group=variable, colour=variable)) +
+  ggtitle('Deaths by Sex and Age') +
+  ylab('Percentage Deaths') +
+  geom_line(size=1.2) +
+  facet_grid(Sex ~ .) +
+  scale_colour_manual(name='Age', labels=c('under 25','25-34','35-44','45-54', 'over 55'), values = myPalette) +
+  scale_x_discrete(breaks = seq(2000,2017,2)) +
+  theme_minimal() +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        strip.background = element_rect(fill='grey'),
+        legend.title = element_blank())
+
+
+```
+
+In 2000 deaths were largely in the under 35s. In 2017 they are dominated by the 35 and over. Particluarly in females.
 
 ### Table 8
 
