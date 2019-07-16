@@ -241,6 +241,42 @@ ggplot(dat.m, aes(x=Year, y=value, fill=variable)) +
 
 In 2000 deaths were largely in the under 35s. In 2017 they are dominated by the 35 and over. Particluarly in females.
 
+### Table 5
+
+```{r t5, fig.width=5, fig.height=6.5}
+# read data
+table.dat = read_excel(xlfile, sheet = 7, col_names=FALSE)
+
+# extract core data and convert to numbers
+dat = table.dat[c(22:26,29:33),c(1,3:5,7)]
+#dat = data.frame(apply(dat, 2, as.numeric))
+colnames(dat) <- c("Age",'Drug Abuse','Accident','Suicide','Undetermined')
+dat = data.frame(dat, Sex = rep(c("Male","Female"), each = 5))
+dat.m = melt(dat, id=c('Age','Sex'))
+dat.m$value = as.numeric(dat.m$value)
+dat.m$Age = factor(dat.m$Age, levels = c('Under 25','25-34','35-44','45-54','55 and over'))
+
+age.totals = dat.m %>% group_by(Age,Sex) %>% summarise(Total = sum(value))
+
+
+ggplot(dat.m, aes(x=Age, y=value, fill=variable)) + 
+  ggtitle("Drug-Related Deaths in Scotland", subtitle="By Sex, Age and Underlying Cause of Death") +
+  ylab('No. Deaths') +
+  geom_col() +
+  facet_grid(Sex ~ .) +
+  scale_fill_manual(values = myPalette) +
+  geom_text(aes(x=Age, y=Total+14, label = Total, fill = NULL), data=age.totals, size=2.8) +
+  theme_minimal() +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        strip.background = element_rect(fill='grey'),
+        legend.title = element_blank())
+
+
+
+```
+
+
 ### Table 8
 
 ```{r t8}
