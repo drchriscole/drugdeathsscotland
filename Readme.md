@@ -1,4 +1,4 @@
-# Drug-related deaths in Scotland 2016
+# Drug-related deaths in Scotland 2017
 
-A repository for looking at and analysing [National Records of Scotland](https://www.nrscotland.gov.uk/news/2017/drug-related-deaths-in-scotland-in-2016) report on drug-related deaths.
+A repository for looking at and analysing [National Records of Scotland](https://www.nrscotland.gov.uk/statistics-and-data/statistics/statistics-by-theme/vital-events/deaths/drug-related-deaths-in-scotland/2017) report on drug-related deaths.
 
