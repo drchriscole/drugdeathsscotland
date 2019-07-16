@@ -1,6 +1,4 @@
 ---
-title: "Drug Related Deaths in Scotland 2017"
-author: "Christian Cole"
 output: html_document
 ---
 
@@ -25,9 +23,17 @@ download.file("https://www.nrscotland.gov.uk/files//statistics/drug-related-deat
 
 ```
 
-## Tab {.tabset}
+# Drug-Related Deaths in Scotland 2017 {.tabset}
 
-### Table 2
+Annual data is published on drug-related deaths (DRDs) in Scotland by the [National Records of Scotland](https://www.nrscotland.gov.uk/statistics-and-data/statistics/statistics-by-theme/vital-events/deaths/drug-related-deaths-in-scotland).
+
+A collection of visualisations of the [2017 data](https://www.nrscotland.gov.uk/files//statistics/drug-related-deaths/17/drug-related-deaths-17-tabs-figs.xlsx) are presented here for those interested in exploring the trends or patterns in the data. Little to no commentary is provided on what the data show.
+
+Each table from the data are presented separately by one or more charts. Not all tables are presented either because the data is incomplete or has already been presented in the raw data already.
+
+All analyses and code are available on [github](https://github.com/drchriscole/drugdeathsscotland) for others to use. Comments and suggestion welcome.
+
+## Table 2
 
 ```{r t2}
 # read data
@@ -63,7 +69,7 @@ ggplot(dat.m, aes(x=Year, y=value, fill=variable)) +
 
 ```
 
-### Table 3
+## Table 3
 
 ```{r t3, fig.width=7}
 # read data
@@ -109,6 +115,7 @@ ggplot(opiates.m, aes(x=Year, y=value, group=variable, colour=variable)) +
         panel.grid.minor.x = element_blank(),
         legend.title = element_blank())
 
+
 # factorise the years to turn into a label and melt
 others$Year <- factor(others$Year)
 others.m = melt(others)
@@ -129,7 +136,10 @@ ggplot(others.m, aes(x=Year, y=value, group=variable, colour=variable)) +
 
 ```
 
-### Table 4
+NB: data prior to 2008 uses a different definition than the data from 2008. See notes in table 3.
+
+
+## Table 4
 
 Table 4 describes quite a lot of data represented in different ways. Each is presented as a different plot.
 
@@ -241,7 +251,7 @@ ggplot(dat.m, aes(x=Year, y=value, fill=variable)) +
 
 In 2000 deaths were largely in the under 35s. In 2017 they are dominated by the 35 and over. Particluarly in females.
 
-### Table 5
+## Table 5
 
 ```{r t5, fig.width=5, fig.height=6.5}
 # read data
@@ -276,7 +286,7 @@ ggplot(dat.m, aes(x=Age, y=value, fill=variable)) +
 
 ```
 
-### Table 6
+## Table 6
 
 ```{r t6, fig.width=6, fig.height=5}
 
@@ -326,7 +336,7 @@ ggplot(dat.m, aes(x=variable, y=value, fill=Age)) +
 
 NB: Totals in this chart will be higher than total number of deaths as deaths can have more than one drug implicated.
 
-### Table 8
+## Table 8
 
 ```{r t8}
 # read data
