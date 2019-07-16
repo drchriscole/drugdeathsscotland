@@ -145,7 +145,7 @@ colnames(dat) <- c('Year','all','male','female','u14','15_24','25_34','35_44','4
 ggplot(dat, aes(x=Year, y=median)) + 
   ggtitle("Median Age at Death") +
   ylab("Age") +
-  geom_line() +
+  geom_line(size=1.2) +
   ylim(c(0,50)) +
   stat_summary(ymin=dat$lq, ymax=dat$uq, geom="ribbon", alpha=0.2, fill='red') +
   scale_x_continuous(breaks = seq(2000,2017,2)) +
@@ -168,7 +168,7 @@ dat.sex.m = melt(dat.sex)
 ggplot(dat.sex.m, aes(x=Year, y=value, group=variable, colour=variable)) + 
   ggtitle("Percentage of Male vs Female Deaths") +
   ylab("Percentage Deaths") +
-  geom_line() +
+  geom_line(size=1.2) +
   ylim(c(10,90)) +
   scale_color_discrete(name='Sex', breaks=c('malpc','fempc'),labels=c('Male','Female')) +
   scale_x_discrete(breaks = seq(2000,2017,2)) +
