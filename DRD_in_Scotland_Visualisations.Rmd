@@ -223,12 +223,12 @@ dat = data.frame(dat, Sex=rep(c('Male','Female'),each=nrow(mdat)))
 dat$Year = factor(dat$Year)
 dat.m = melt(dat)
 
-ggplot(dat.m, aes(x=Year, y=value, group=variable, colour=variable)) +
+ggplot(dat.m, aes(x=Year, y=value, fill=variable)) +
   ggtitle('Deaths by Sex and Age') +
   ylab('Percentage Deaths') +
-  geom_line(size=1.2) +
+  geom_col() +
   facet_grid(Sex ~ .) +
-  scale_colour_manual(name='Age', labels=c('under 25','25-34','35-44','45-54', 'over 55'), values = myPalette) +
+  scale_fill_manual(name='Age', labels=c('under 25','25-34','35-44','45-54', 'over 55'), values = myPalette) +
   scale_x_discrete(breaks = seq(2000,2017,2)) +
   theme_minimal() +
   theme(panel.grid.major.x = element_blank(),
