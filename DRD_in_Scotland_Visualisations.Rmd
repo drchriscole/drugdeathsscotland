@@ -378,7 +378,7 @@ ggplot(dat.m, aes(x=Year, y=value, group=Age, colour=Age)) +
 
 ```
 
-## Table HB2
+## Table HB1
 
 ```{r tHB2a}
 # read data
@@ -412,21 +412,21 @@ ggplot(dat, aes(x=Region, y=`2008`)) +
 ```{r tHBb}
 
 # remove islands as numbers to small
-dat = dat[dat$`2017` > 5,]
+#dat = dat[dat$`2017` > 5,]
 
 # do percentage change between 2017 & 2018
-change.dat = data.frame(Region = dat$Region, Change = round(100*(dat$`2018` - dat$`2017`)/dat$`2017`,1))
+change.dat = data.frame(Region = dat$Region, Change = dat$`2018` - dat$`2017`, PcChange = round(100*(dat$`2018` - dat$`2017`)/dat$`2017`,1))
 
 change.dat$Region = factor(change.dat$Region, levels = change.dat[order(change.dat$Change),]$Region)
 
 ggplot(change.dat, aes(x=Region, y=Change, fill="#D55E00")) +
-  ggtitle("2018 Change in Drug-Related Deaths", subtitle="By health board (%)") +
-  ylab("% Change") +
+  ggtitle("2018 Change in Drug-Related Deaths", subtitle="By NHS health board") +
+  ylab("Change in No. Deaths") +
   xlab('') +
   geom_col() +
-  ylim(c(-15,110)) +
+  ylim(c(-15,150)) +
   coord_flip() +
-  geom_text(aes(label = sprintf("%.1f%%",Change)), hjust = ifelse(change.dat$Change > 0, -0.2, 1.1), size=3) +
+  geom_text(aes(label = sprintf("%.1f%%",PcChange)), hjust = ifelse(change.dat$PcChange > 0, -0.2, 1.1), size=3) +
   theme_minimal() +
   theme(panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank(),
