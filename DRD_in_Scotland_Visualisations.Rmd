@@ -366,14 +366,72 @@ ggplot(dat.m, aes(x=Year, y=value, group=Age, colour=Age)) +
   geom_hline(yintercept = yr5mean, colour="grey", linetype="dashed") + 
   geom_line(size=1.2) + 
   ylab("Deaths per 1000 population") + 
-  annotate("text", label="Mean 2013-2017", x=16.8,y=yr5mean-0.015,size=3,colour="grey") +
-  scale_x_discrete(breaks=seq(2000,2016,2)) + 
+  annotate("text", label="Mean 2014-2018", x=16.8,y=yr5mean-0.015,size=3,colour="grey") +
+  scale_x_discrete(breaks=seq(2000,2018,2)) + 
   scale_color_manual(values=myPalette) +
   ggtitle("Death Rates by Age") +
   theme_minimal() +
   theme(panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank())
 
+
+
+```
+
+## Table HB2
+
+```{r tHB2a}
+# read data
+table.dat = read_excel(xlfile, sheet = "HB1 - summary", col_names=FALSE)
+
+# extract core data and convert to numbers
+dat = table.dat[14:27,1:12]
+colnames(dat) = c('Region', seq(2008,2018,1))
+dat[dat$Region == 'Highland 3' , 1] = 'Highland'
+dat[dat$Region == 'Greater Glasgow & Clyde 3' , 1] = 'Greater Glasgow & Clyde'
+
+dat$Region = factor(dat$Region, c(dat[order(dat$`2018`),]$Region))
+
+dat.m = melt(dat)
+
+ggplot(dat, aes(x=Region, y=`2008`)) +
+  ggtitle("Drug-Related Deaths in Scotland", subtitle="Change between 2008 - 2018") +
+  geom_linerange(aes(ymin=`2008`,ymax=`2018`), colour='grey', size=1.5) +
+  geom_point(aes(y=`2008`), size =1.2, colour='orange') +
+  geom_point(aes(y=`2018`), size =1.2, colour='orange') +
+  geom_point(aes(y=`2017`), size =1.2, colour='darkgreen') +
+  geom_text(aes(y=`2017`, label = ifelse(Region == "Greater Glasgow & Clyde", '2017', '')), vjust = -0.5, size=2.8, colour="grey30") +
+  geom_text(aes(y=`2008`, label = ifelse(Region == "Greater Glasgow & Clyde", '2008', '')), vjust = -0.5, size=2.8, colour="grey30") +
+  geom_text(aes(y=`2018`, label = ifelse(Region == "Greater Glasgow & Clyde", '2018', '')), vjust = -0.5, size=2.8, colour="grey30") +
+  ylab('No. Deaths') +
+  xlab('') +
+  coord_flip() +
+  theme_minimal()
+```
+
+```{r tHBb}
+
+# remove islands as numbers to small
+dat = dat[dat$`2017` > 5,]
+
+# do percentage change between 2017 & 2018
+change.dat = data.frame(Region = dat$Region, Change = round(100*(dat$`2018` - dat$`2017`)/dat$`2017`,1))
+
+change.dat$Region = factor(change.dat$Region, levels = change.dat[order(change.dat$Change),]$Region)
+
+ggplot(change.dat, aes(x=Region, y=Change, fill="#D55E00")) +
+  ggtitle("2018 Change in Drug-Related Deaths", subtitle="By health board (%)") +
+  ylab("% Change") +
+  xlab('') +
+  geom_col() +
+  ylim(c(-15,110)) +
+  coord_flip() +
+  geom_text(aes(label = sprintf("%.1f%%",Change)), hjust = ifelse(change.dat$Change > 0, -0.2, 1.1), size=3) +
+  theme_minimal() +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        legend.position = "none")
+  
 
 
 ```
