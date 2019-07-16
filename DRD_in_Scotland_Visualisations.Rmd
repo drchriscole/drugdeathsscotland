@@ -17,7 +17,7 @@ library(dplyr)
 reg.colours = c("#4D4D4D", "#AEAEAE")
 
 # The colour-blind palette with grey:
-myPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+myPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#000000")
 
 # read data - download first as read_excel() can't do URLs
 xlfile = tempfile(fileext = '.xlsx')
@@ -276,6 +276,55 @@ ggplot(dat.m, aes(x=Age, y=value, fill=variable)) +
 
 ```
 
+### Table 6
+
+```{r t6, fig.width=6, fig.height=5}
+
+# read data
+table.dat = read_excel(xlfile, sheet = 8, col_names=FALSE)
+
+# extract core data and convert to numbers
+dat = table.dat[c(25:29,32:36),c(1,3:14)]
+colnames(dat) <-c('Age','Heroin/morphine','Methodone','Heroin or OST','Codeine', 'Dihydrocodeine', 'Any opiate', 'Any benzodiazepine', 'Diazepam', 'Cocaine', 'Ecstasy', 'Amphetamines', 'Alcohol')
+
+# combine the codeine/dihydrocodeine cols and remove
+dat = data.frame(dat, Codeines = as.numeric(dat$Codeine) + as.numeric(dat$Dihydrocodeine))
+
+# subtract the diazepam data from 
+# the any benzo data to make an "other benzo" column
+dat = data.frame(dat, "Other benzodiazepines"= as.numeric(dat$Any.benzodiazepine) - as.numeric(dat$Diazepam))
+
+# remove uninterest columns:
+#   heroin or OST and any opiate are not very informative
+#   Codeine/dihydrocodeine unnecessary now as they've been combined
+#   any benzo is superceded by other benzos
+# individual cases)
+dat = dat[,c(1:3,9:15)]
+
+dat = data.frame(dat, Sex = rep(c("Male","Female"), each = 5))
+dat.m = melt(dat, id=c('Age','Sex'))
+dat.m$value = as.numeric(dat.m$value)
+dat.m$Age = factor(dat.m$Age, levels = c('Under 25','25-34','35-44','45-54','55 and over'))
+
+ggplot(dat.m, aes(x=variable, y=value, fill=Age)) + 
+  ggtitle("Drug-Related Deaths in Scotland", subtitle="By Sex, Age and Implicated Drug") +
+  ylab('No. Deaths') +
+  xlab('') +
+  geom_col() +
+  facet_grid(Sex ~ .) +
+  coord_flip() +
+  scale_fill_manual(values = myPalette) +
+#  geom_text(aes(x=Age, y=Total+14, label = Total, fill = NULL), data=age.totals, size=2.8) +
+  theme_minimal() +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        strip.background = element_rect(fill='grey'),
+        legend.title = element_blank())
+
+
+```
+
+NB: Totals in this chart will be higher than total number of deaths as deaths can have more than one drug implicated.
 
 ### Table 8
 
