@@ -108,7 +108,7 @@ ggplot(opiates.m, aes(x=Year, y=value, group=variable, colour=variable)) +
   ylim(c(0,600)) +
   geom_vline(xintercept=which(opiates$Year == '2008'), colour="grey", linetype="dashed") +
   geom_line(size=1.1) +
-  scale_color_manual(values = myPalette, labels = c('Heroine or Morphine','Methadone','Diazepam','Etizolam','Codeines','Other prescribed \nbenzodiazepines','Other street\nbenzodiazipnes')) +
+  scale_color_manual(values = myPalette, labels = c('Heroin or Morphine','Methadone','Diazepam','Etizolam','Codeines','Other prescribed \nbenzodiazepines','Other street\nbenzodiazipnes')) +
   scale_x_discrete(breaks = seq(2000,2018,2)) +
   theme_minimal() +
   theme(panel.grid.major.x = element_blank(),
