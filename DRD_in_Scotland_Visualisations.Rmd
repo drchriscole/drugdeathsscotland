@@ -436,3 +436,34 @@ ggplot(change.dat, aes(x=Region, y=Change, fill="#D55E00")) +
 
 ```
 
+## Table C1
+
+This is a test visualisation. 
+
+```{r tC1, fig.width=6, fig.height=7}
+
+## experiment with small multiples
+# read data
+table.dat = read_excel(xlfile, sheet = "C1 - summary", col_names=FALSE)
+
+# extract core data and convert to numbers
+dat = table.dat[10:41,1:12]
+colnames(dat) = c('Council',seq(2008,2018,1))
+dat$Council = c("Aberdeen", "Aberdeenshire", "Angus", "Argyll & Bute", "Edinburgh", "Clack'shire", "Dumfries & Ga.", "Dundee", "E. Ayrshire", "E. Dunb'shire", "E. Lothian", "E. Renf'shire", "Falkirk", "Fife", "Glasgow", "Highland", "Inverclyde", "Midlothian", "Moray", "Na h-Eil. Siar", "N. Ayrshire", "N. Lanarkshire", "Orkney Islands", "Perth & Kinross", "Renfrewshire", "Scot. Borders", "Shetland Islds", "South Ayrshire", "S. Lanarkshire", "Stirling", "W. Dunb'shire", "West Lothian")
+dat.m = melt(dat)
+
+ggplot(dat.m, aes(x=variable, y=value, group=Council)) +
+  ggtitle("Drug-Related Deaths by Council") +
+  xlab('Year') +
+  ylab('No. Deaths') +
+  geom_line(size=1.1, colour='darkgreen') +
+  scale_x_discrete(breaks=c(2008, 2018), labels=c("'08","'18")) +
+  facet_wrap(~Council) +
+  theme_minimal() +
+  theme(panel.background = element_rect(fill='#e0ecff'),
+        panel.grid.major.y = element_line(colour = 'grey'),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor = element_blank())
+  
+
+```
