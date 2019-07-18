@@ -436,3 +436,59 @@ ggplot(change.dat, aes(x=Region, y=Change, fill="#D55E00")) +
 
 ```
 
+## Regional Comparisons 
+
+```{r tC3, fig.height=10, fig.width=8}
+# read data
+table.dat = read_excel(xlfile, sheet = "C3 - drugs reported", col_names=FALSE)
+
+# extract core data and convert to numbers
+dat = table.dat[c(13:44),c(1:18)]
+councils = dat[,1]
+dat = data.frame(apply(dat[,2:18], 2, as.numeric))
+dat = data.frame(councils, dat)
+colnames(dat) <-c('Council','Totals','Heroin.morphine','Methadone','HeroinOST','Codeine', 'Dihydrocodeine', 'Any opiate', 'Anybenzo', 'Presbenzo', 'Diazepam', 'Streetbenzo', 'Etizolam', 'GabaPre', 'Cocaine', 'Ecstasy', 'Amphetamines', 'Alcohol')
+
+dat$Council = c("Abz", "Absh", "Angus", "Argyll", "Edi", "Clk", "DnG", "Dundee", "E. Ayr", "E. Dun", "E. Loth", "E. Ren", "Falkirk", "Fife", "Glasgow", "Highland", "Inverclyde", "Midlothian", "Moray", "Na h-Eil", "N. Ayr", "N. Lan", "Orkney", "PnK", "Ren", "SBord", "Shetld", "S. Ayr", "S. Lan", "Stirling", "W. Dun", "West Loth")
+
+dat = dat[dat$Totals > 40,]
+
+# combine the codeine/dihydrocodeine cols and remove
+dat = data.frame(dat, Codeines = as.numeric(dat$Codeine) + as.numeric(dat$Dihydrocodeine))
+
+# subtract the diazepam data from 
+# the any prescsribed benzo data to make an "other pres benzo" column
+dat = data.frame(dat, "Otherpbenzo"=as.numeric(dat$Presbenzo) - as.numeric(dat$Diazepam))
+
+# similarly subtract etz for street benzo to 
+# give other street benzo
+dat = data.frame(dat, "Othersbenzo"=as.numeric(dat$Streetbenzo) - as.numeric(dat$Etizolam))
+
+# remove uninterest columns:
+#   heroin or OST and any opiate are not very informative
+#   Codeine/dihydrocodeine unnecessary now as they've been combined
+#   any benzo is superceded by other benzos
+# individual cases)
+dat = dat[,c(1:4,11,13:21)]
+
+dat.pc = data.frame(dat$Council, 100*dat[,3:14]/dat$Totals)
+dat.pc.m = melt(dat.pc)
+
+
+ggplot(dat.pc.m, aes(x=dat.Council, y=value, fill=factor(ifelse(dat.Council=="Dundee", "Y","N")))) +
+  ggtitle("Drug Implicated in Death", subtitle="For councils with >40 deaths") +
+  xlab("Council") +
+  ylab("Percentage Deaths") +
+  geom_col() +
+  geom_text(aes(label=sprintf("%.1f%%",value)), size=3, vjust=-0.5) +
+  scale_y_continuous(limits = c(0,100), breaks = c(0, 50, 100)) +
+  scale_fill_manual(values=c('grey','orange'))+
+  facet_grid(variable ~ .) +
+  theme_minimal() +
+  theme(strip.text.y = element_text(angle = 0),
+        legend.position = "none")
+
+```
+
+
+
