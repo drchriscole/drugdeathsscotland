@@ -1,5 +1,7 @@
 ---
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -449,7 +451,7 @@ dat = data.frame(apply(dat[,2:18], 2, as.numeric))
 dat = data.frame(councils, dat)
 colnames(dat) <-c('Council','Totals','Heroin.morphine','Methadone','HeroinOST','Codeine', 'Dihydrocodeine', 'Any opiate', 'Anybenzo', 'Presbenzo', 'Diazepam', 'Streetbenzo', 'Etizolam', 'GabaPre', 'Cocaine', 'Ecstasy', 'Amphetamines', 'Alcohol')
 
-dat$Council = c("Abz", "Absh", "Angus", "Argyll", "Edi", "Clk", "DnG", "Dundee", "E. Ayr", "E. Dun", "E. Loth", "E. Ren", "Falkirk", "Fife", "Glasgow", "Highland", "Inverclyde", "Midlothian", "Moray", "Na h-Eil", "N. Ayr", "N. Lan", "Orkney", "PnK", "Ren", "SBord", "Shetld", "S. Ayr", "S. Lan", "Stirling", "W. Dun", "West Loth")
+dat$Council = c("Aberdeen", "Abrdshr", "Angus", "Argyll", "Edinbrugh", "Clk", "DnG", "Dundee", "E. Ayr", "E. Dun", "E. Loth", "E. Ren", "Falkirk", "Fife", "Glasgow", "Highland", "Inverclyde", "Midlothian", "Moray", "Na h-Eil", "N. Ayr", "N. Lankshr", "Orkney", "PnK", "Renfrshr", "SBord", "Shetld", "S. Ayr", "S. Lankshr", "Stirling", "W. Dun", "West Loth")
 
 dat = dat[dat$Totals > 40,]
 
@@ -476,6 +478,24 @@ dat = dat[,c(1:4,11,13:21)]
 dat.pc = data.frame(dat$Council, 100*dat[,3:14]/dat$Totals)
 dat.pc.m = melt(dat.pc)
 
+drug_names = list(
+  'Heroin.morphine' = "Heroin or\nMorphine",
+  'Methadone' = 'Methadone',
+  'Diazepam' = "Diazepam",
+  'Etizolam' = 'Etizolam',
+  'GabaPre' = "Gabapentin or\nPregabalin", 
+  'Cocaine' = 'Cocaine',
+  'Ecstasy' = 'Ecstasy',
+  'Amphetamines' = 'Amphetamines',
+  'Alcohol' = 'Alcohol',
+  'Codeines' = 'Codeines',
+  'Otherpbenzo' = "Other prescribed\nbenzodiazepines",
+  'Othersbenzo' = "Other 'street'\nbenzodiazepines"
+)
+drug_labeller = function(string) {
+  return(drug_names[string])
+}
+
 
 ggplot(dat.pc.m, aes(x=dat.Council, y=value, fill=factor(ifelse(dat.Council=="Dundee", "Y","N")))) +
   ggtitle("Drug Implicated in Death", subtitle="For councils with >40 deaths") +
@@ -485,7 +505,7 @@ ggplot(dat.pc.m, aes(x=dat.Council, y=value, fill=factor(ifelse(dat.Council=="Du
   geom_text(aes(label=sprintf("%.1f%%",value)), size=3, vjust=-0.5) +
   scale_y_continuous(limits = c(0,100), breaks = c(0, 50, 100)) +
   scale_fill_manual(values=c('grey','orange'))+
-  facet_grid(variable ~ .) +
+  facet_grid(variable ~ ., labeller = labeller(variable=drug_labeller)) +
   theme_minimal() +
   theme(strip.text.y = element_text(angle = 0),
         legend.position = "none")
@@ -497,20 +517,25 @@ ggplot(dat.pc.m, aes(x=dat.Council, y=value, fill=factor(ifelse(dat.Council=="Du
 table.dat = read_excel(xlfile, sheet = "C4 - rates by age-group", col_names=FALSE)
 
 # extract core data and convert to numbers
-dat = table.dat[c(11:42),c(1:6)]
+dat = table.dat[c(11:42),c(1:6,8)]
 councils = dat[,1]
-dat = data.frame(apply(dat[,2:6], 2, as.numeric))
+dat = data.frame(apply(dat[,2:7], 2, as.numeric))
 dat = data.frame(councils, dat)
-colnames(dat) <-c('Council','15-24','25-34','35-44','45-54','55-64')
+colnames(dat) <-c('Council','15-24','25-34','35-44','45-54','55-64','AllAges')
 
-dat$Council = c("Abz", "Absh", "Angus", "Argyll", "Edi", "Clk", "DnG", "Dundee", "E. Ayr", "E. Dun", "E. Loth", "E. Ren", "Falkirk", "Fife", "Glasgow", "Highland", "Inverclyde", "Midlothian", "Moray", "Na h-Eil", "N. Ayr", "N. Lan", "Orkney", "PnK", "Ren", "SBord", "Shetld", "S. Ayr", "S. Lan", "Stirling", "W. Dun", "West Loth")
+dat$Council = c("Aberdeen", "Abrdshr", "Angus", "Argyll", "Edinbrugh", "Clk", "DnG", "Dundee", "E. Ayr", "E. Dun", "E. Loth", "E. Ren", "Falkirk", "Fife", "Glasgow", "Highland", "Inverclyde", "Midlothian", "Moray", "Na h-Eil", "N. Ayr", "N. Lankshr", "Orkney", "PnK", "Renfrshr", "SBord", "Shetld", "S. Ayr", "S. Lankshr", "Stirling", "W. Dun", "West Loth")
 
 dat = dat[dat$Council %in% list.councils,]
+
+all.ages = data.frame(dat$Council,round(dat$AllAges,2))
+names(all.ages) = c('Council', 'AllAges')
+
+dat = dat[,-7]
 
 dat.m = melt(dat)
 
 ggplot(dat.m, aes(x=variable, y=value, group=Council, colour=ifelse(Council == "Dundee", "A","B"))) +
-  ggtitle("Drug-Related Deaths per 1,000 population", subtitle = "By council area") +
+  ggtitle("Drug-Related Deaths per 1,000 population", subtitle = "By council area (annual average 2014-2018)") +
   ylab("Death Rate") +
   xlab("Age Group") +
   geom_line() +
@@ -520,6 +545,11 @@ ggplot(dat.m, aes(x=variable, y=value, group=Council, colour=ifelse(Council == "
   scale_colour_manual(values=c('orange','black')) +
   geom_text(aes(label=round(value,2)), vjust = -0.6, size=2.4, colour="black") +
   facet_grid(Council ~.) +
+  # tried to add the "All ages" average to the plots,
+  # got it looks too busy and tricky to format right. Removing for time being
+#  geom_hline(aes(yintercept=AllAges), data=all.ages, colour='grey',linetype='dashed') +
+#  geom_text(aes(x='55-64',y=AllAges, label=AllAges), data=all.ages, vjust=-0.6,hjust=-3, colour='grey', size=2.4) +
+#  geom_text(aes(x='55-64',y=AllAges, label='All ages'), data=all.ages, vjust=0.6,hjust=-2, colour='grey', size=2.4) +
   theme_minimal() +
   theme(strip.text.y = element_text(angle=0),
         legend.position = "none")
