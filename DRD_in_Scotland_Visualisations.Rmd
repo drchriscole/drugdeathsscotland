@@ -453,6 +453,8 @@ dat$Council = c("Abz", "Absh", "Angus", "Argyll", "Edi", "Clk", "DnG", "Dundee",
 
 dat = dat[dat$Totals > 40,]
 
+list.councils = dat$Council
+
 # combine the codeine/dihydrocodeine cols and remove
 dat = data.frame(dat, Codeines = as.numeric(dat$Codeine) + as.numeric(dat$Dihydrocodeine))
 
@@ -490,5 +492,38 @@ ggplot(dat.pc.m, aes(x=dat.Council, y=value, fill=factor(ifelse(dat.Council=="Du
 
 ```
 
+```{r tC4, fig.height=6}
+# read data
+table.dat = read_excel(xlfile, sheet = "C4 - rates by age-group", col_names=FALSE)
+
+# extract core data and convert to numbers
+dat = table.dat[c(11:42),c(1:6)]
+councils = dat[,1]
+dat = data.frame(apply(dat[,2:6], 2, as.numeric))
+dat = data.frame(councils, dat)
+colnames(dat) <-c('Council','15-24','25-34','35-44','45-54','55-64')
+
+dat$Council = c("Abz", "Absh", "Angus", "Argyll", "Edi", "Clk", "DnG", "Dundee", "E. Ayr", "E. Dun", "E. Loth", "E. Ren", "Falkirk", "Fife", "Glasgow", "Highland", "Inverclyde", "Midlothian", "Moray", "Na h-Eil", "N. Ayr", "N. Lan", "Orkney", "PnK", "Ren", "SBord", "Shetld", "S. Ayr", "S. Lan", "Stirling", "W. Dun", "West Loth")
+
+dat = dat[dat$Council %in% list.councils,]
+
+dat.m = melt(dat)
+
+ggplot(dat.m, aes(x=variable, y=value, group=Council, colour=ifelse(Council == "Dundee", "A","B"))) +
+  ggtitle("Drug-Related Deaths per 1,000 population", subtitle = "By council area") +
+  ylab("Death Rate") +
+  xlab("Age Group") +
+  geom_line() +
+  geom_point(size=1.6, colour="black") +
+  geom_point(size=0.8, colour='white') +
+  scale_y_continuous(limits = c(0, 1.4), breaks = c(0,0.4,0.8,1.2)) +
+  scale_colour_manual(values=c('orange','black')) +
+  geom_text(aes(label=round(value,2)), vjust = -0.6, size=2.4, colour="black") +
+  facet_grid(Council ~.) +
+  theme_minimal() +
+  theme(strip.text.y = element_text(angle=0),
+        legend.position = "none")
+
+```
 
 
