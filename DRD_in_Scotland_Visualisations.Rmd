@@ -1,7 +1,7 @@
 ---
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -451,7 +451,7 @@ dat = data.frame(apply(dat[,2:18], 2, as.numeric))
 dat = data.frame(councils, dat)
 colnames(dat) <-c('Council','Totals','Heroin.morphine','Methadone','HeroinOST','Codeine', 'Dihydrocodeine', 'Any opiate', 'Anybenzo', 'Presbenzo', 'Diazepam', 'Streetbenzo', 'Etizolam', 'GabaPre', 'Cocaine', 'Ecstasy', 'Amphetamines', 'Alcohol')
 
-dat$Council = c("Aberdeen", "Abrdshr", "Angus", "Argyll", "Edinbrugh", "Clk", "DnG", "Dundee", "E. Ayr", "E. Dun", "E. Loth", "E. Ren", "Falkirk", "Fife", "Glasgow", "Highland", "Inverclyde", "Midlothian", "Moray", "Na h-Eil", "N. Ayr", "N. Lankshr", "Orkney", "PnK", "Renfrshr", "SBord", "Shetld", "S. Ayr", "S. Lankshr", "Stirling", "W. Dun", "West Loth")
+dat$Council = c("Aberdeen", "Abrdshr", "Angus", "Argyll", "Edinburgh", "Clk", "DnG", "Dundee", "E. Ayr", "E. Dun", "E. Loth", "E. Ren", "Falkirk", "Fife", "Glasgow", "Highland", "Inverclyde", "Midlothian", "Moray", "Na h-Eil", "N. Ayr", "N. Lankshr", "Orkney", "PnK", "Renfrshr", "SBord", "Shetld", "S. Ayr", "S. Lankshr", "Stirling", "W. Dun", "West Loth")
 
 dat = dat[dat$Totals > 40,]
 
@@ -523,7 +523,7 @@ dat = data.frame(apply(dat[,2:7], 2, as.numeric))
 dat = data.frame(councils, dat)
 colnames(dat) <-c('Council','15-24','25-34','35-44','45-54','55-64','AllAges')
 
-dat$Council = c("Aberdeen", "Abrdshr", "Angus", "Argyll", "Edinbrugh", "Clk", "DnG", "Dundee", "E. Ayr", "E. Dun", "E. Loth", "E. Ren", "Falkirk", "Fife", "Glasgow", "Highland", "Inverclyde", "Midlothian", "Moray", "Na h-Eil", "N. Ayr", "N. Lankshr", "Orkney", "PnK", "Renfrshr", "SBord", "Shetld", "S. Ayr", "S. Lankshr", "Stirling", "W. Dun", "West Loth")
+dat$Council = c("Aberdeen", "Abrdshr", "Angus", "Argyll", "Edinburgh", "Clk", "DnG", "Dundee", "E. Ayr", "E. Dun", "E. Loth", "E. Ren", "Falkirk", "Fife", "Glasgow", "Highland", "Inverclyde", "Midlothian", "Moray", "Na h-Eil", "N. Ayr", "N. Lankshr", "Orkney", "PnK", "Renfrshr", "SBord", "Shetld", "S. Ayr", "S. Lankshr", "Stirling", "W. Dun", "West Loth")
 
 dat = dat[dat$Council %in% list.councils,]
 
