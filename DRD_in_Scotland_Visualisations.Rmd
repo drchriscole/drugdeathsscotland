@@ -509,6 +509,7 @@ ggplot(dat.pc.m, aes(x=dat.Council, y=value, fill=factor(ifelse(dat.Council=="Du
   theme_minimal() +
   theme(strip.text.y = element_text(angle = 0),
         legend.position = "none")
+#ggsave("DRD_implicated_drug.png", height = 10, width= 8, units = 'in', dpi=150)
 
 ```
 
@@ -553,7 +554,7 @@ ggplot(dat.m, aes(x=variable, y=value, group=Council, colour=ifelse(Council == "
   theme_minimal() +
   theme(strip.text.y = element_text(angle=0),
         legend.position = "none")
-
+#ggsave("DRD_age_group.png", height = 6, width= 6, units = 'in', dpi=150)
 ```
 
 
