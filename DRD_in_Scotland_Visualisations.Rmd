@@ -106,6 +106,7 @@ opiates.m = melt(opiates)
 
 ggplot(opiates.m, aes(x=Year, y=value, group=variable, colour=variable)) +
   ggtitle("Drugs Implicated in Death", subtitle = 'Opiates and benzodiazepines') +
+#  labs(caption = "Data prior to 2008 uses a different definition than the data from 2008.") +
   ylab("No. of Deaths") +
   ylim(c(0,600)) +
   geom_vline(xintercept=which(opiates$Year == '2008'), colour="grey", linetype="dashed") +
@@ -117,6 +118,8 @@ ggplot(opiates.m, aes(x=Year, y=value, group=variable, colour=variable)) +
         panel.grid.minor.x = element_blank(),
         legend.title = element_blank())
 
+#ggsave("DRD_implicated_drug1.png")
+
 
 # factorise the years to turn into a label and melt
 others$Year <- factor(others$Year)
@@ -124,6 +127,7 @@ others.m = melt(others)
 
 ggplot(others.m, aes(x=Year, y=value, group=variable, colour=variable)) +
   ggtitle("Drugs Implicated in Death", subtitle = 'Others') +
+#  labs(caption = "Data prior to 2008 uses a different definition than the data from 2008.") +
   ylab("No. of Deaths") +
   ylim(c(0,600)) +
   geom_vline(xintercept=which(opiates$Year == '2008'), colour="grey", linetype="dashed") +
@@ -134,6 +138,8 @@ ggplot(others.m, aes(x=Year, y=value, group=variable, colour=variable)) +
   theme(panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
         legend.title = element_blank())
+
+#ggsave("DRD_implicated_drug2.png")
 
 
 ```
@@ -183,6 +189,7 @@ dat.sex.m = melt(dat.sex)
 
 ggplot(dat.sex.m, aes(x=Year, y=value, group=variable, colour=variable)) + 
   ggtitle("Percentage of Male vs Female Deaths") +
+#  labs(caption="Males are mostly affected by drug-related deaths, but female deaths have increased since 2000") +
   ylab("Percentage Deaths") +
   geom_line(size=1.2) +
   ylim(c(10,90)) +
@@ -192,6 +199,9 @@ ggplot(dat.sex.m, aes(x=Year, y=value, group=variable, colour=variable)) +
   theme(panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
         legend.title = element_blank())
+
+#ggsave("mf_plot.png")
+
 ```
 
 Males are mostly affected by drug-related deaths, but females are increasing.
@@ -237,6 +247,7 @@ dat.m = melt(dat)
 
 ggplot(dat.m, aes(x=Year, y=value, fill=variable)) +
   ggtitle('Deaths by Sex and Age') +
+#  labs(caption = "In 2000 deaths were largely in the under 35s.\nIn 2018 they are dominated by the 35 and over. Particluarly in females.") +
   ylab('Percentage Deaths') +
   geom_col() +
   facet_grid(Sex ~ .) +
@@ -248,7 +259,7 @@ ggplot(dat.m, aes(x=Year, y=value, fill=variable)) +
         strip.background = element_rect(fill='grey'),
         legend.title = element_blank())
 
-
+#ggsave("sex_age.png")
 ```
 
 In 2000 deaths were largely in the under 35s. In 2018 they are dominated by the 35 and over. Particluarly in females.
