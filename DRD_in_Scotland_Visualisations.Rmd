@@ -10,7 +10,6 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 library(readxl)
 library(reshape2)
 library(ggplot2)
-library(tibble)
 library(dplyr)
 
 # default region colours
