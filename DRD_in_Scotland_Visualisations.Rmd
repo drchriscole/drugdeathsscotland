@@ -450,6 +450,44 @@ ggplot(change.dat, aes(x=Region, y=Change, fill="#D55E00")) +
 
 ## Regional Comparisons 
 
+```{r tC1, fig.width=7}
+# read data
+table.dat = read_excel(xlfile, sheet = "C1 - summary", col_names=FALSE)
+
+# extract core data and convert to numbers
+dat = table.dat[c(8,10:41),c(1:12,17)]
+dat = data.frame(dat[,1],apply(dat[,2:13], 2, as.numeric))
+names(dat) = c('Council',seq(2008,2018),'Pop')
+
+# calc DRD rate
+dat = cbind(dat, Rate = 1000000*dat$`2018`/dat$Pop)
+
+# remove whole-of-scotland data
+scot.dat = dat[1,]
+dat = dat[-1,]
+
+# order factors by DRD rate
+dat$Council = factor(dat$Council, levels=dat[order(dat$Rate),1])
+
+ggplot(dat, aes(x=Council, y=Rate, fill=factor(ifelse(dat$Council=="Dundee City", "Y","N")))) + 
+  geom_col() +
+  ylim(c(0,480)) +
+  ggtitle("Drug-Related Deaths By Council Area", subtitle = "Per million population") +
+  ylab("Drug-Related Deaths (per million population)") +
+  labs(caption="Using 2016 population data") +
+  geom_hline(aes(yintercept=scot.dat$Rate), colour="#990000", linetype="dashed") +
+  geom_text(aes(label = round(Rate,1)), hjust=-0.1, size=2.5) +
+  scale_fill_manual(values=c('grey','orange'))+
+  annotate("text", label=sprintf("Scotland (%.1f)",scot.rate), x=5.5, y=scot.rate+8,colour="grey", angle=-90) +
+  coord_flip() +
+  theme_minimal() +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        legend.position = "none")
+#ggsave("TableC1.png")
+```
+
+
 ```{r tC3, fig.height=10, fig.width=8}
 # read data
 table.dat = read_excel(xlfile, sheet = "C3 - drugs reported", col_names=FALSE)
