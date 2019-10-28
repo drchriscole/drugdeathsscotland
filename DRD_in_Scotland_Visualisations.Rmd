@@ -1,7 +1,7 @@
 ---
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -478,7 +478,7 @@ ggplot(dat, aes(x=Council, y=Rate, fill=factor(ifelse(dat$Council=="Dundee City"
   geom_hline(aes(yintercept=scot.dat$Rate), colour="#990000", linetype="dashed") +
   geom_text(aes(label = round(Rate,1)), hjust=-0.1, size=2.5) +
   scale_fill_manual(values=c('grey','orange'))+
-  annotate("text", label=sprintf("Scotland (%.1f)",scot.rate), x=5.5, y=scot.rate+8,colour="grey", angle=-90) +
+  annotate("text", label=sprintf("Scotland (%.1f)",scot.dat$Rate), x=4, y=scot.dat$Rate+7,colour="grey", angle=-90, size=2.5) +
   coord_flip() +
   theme_minimal() +
   theme(panel.grid.major.y = element_blank(),
