@@ -1,5 +1,7 @@
 ---
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -8,7 +10,6 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 library(readxl)
 library(reshape2)
 library(ggplot2)
-library(tibble)
 library(dplyr)
 
 # default region colours
@@ -52,7 +53,7 @@ dat.m = melt(dat)
 
 year.totals = dat.m %>% group_by(Year) %>% summarise(Total = sum(value))
 
-ggplot(dat.m, aes(x=Year, y=value, fill=variable)) + 
+ggplot(dat.m, aes(x=Year, y=value, fill=variable)) +
   ggtitle("Underlying Cause of Death") +
   ylab("No. Deaths") +
   geom_col() +
@@ -80,11 +81,11 @@ colnames(dat) <- c('Year','Heroin.morphine','Methadone','HeroinOST','Codeine', '
 # combine the codeine/dihydrocodeine cols and remove
 dat = data.frame(dat, Codeines = dat$Codeine + dat$Dihydrocodeine)
 
-# subtract the diazepam data from 
+# subtract the diazepam data from
 # the any prescsribed benzo data to make an "other pres benzo" column
 dat = data.frame(dat, "Otherpbenzo"=dat$Presbenzo - dat$Diazepam)
 
-# similarly subtract etz for street benzo to 
+# similarly subtract etz for street benzo to
 # give other street benzo
 dat = data.frame(dat, "Othersbenzo"=dat$Streetbenzo - dat$Etizolam)
 
@@ -104,6 +105,7 @@ opiates.m = melt(opiates)
 
 ggplot(opiates.m, aes(x=Year, y=value, group=variable, colour=variable)) +
   ggtitle("Drugs Implicated in Death", subtitle = 'Opiates and benzodiazepines') +
+#  labs(caption = "Data prior to 2008 uses a different definition than the data from 2008.") +
   ylab("No. of Deaths") +
   ylim(c(0,600)) +
   geom_vline(xintercept=which(opiates$Year == '2008'), colour="grey", linetype="dashed") +
@@ -115,6 +117,8 @@ ggplot(opiates.m, aes(x=Year, y=value, group=variable, colour=variable)) +
         panel.grid.minor.x = element_blank(),
         legend.title = element_blank())
 
+#ggsave("DRD_implicated_drug1.png")
+
 
 # factorise the years to turn into a label and melt
 others$Year <- factor(others$Year)
@@ -122,6 +126,7 @@ others.m = melt(others)
 
 ggplot(others.m, aes(x=Year, y=value, group=variable, colour=variable)) +
   ggtitle("Drugs Implicated in Death", subtitle = 'Others') +
+#  labs(caption = "Data prior to 2008 uses a different definition than the data from 2008.") +
   ylab("No. of Deaths") +
   ylim(c(0,600)) +
   geom_vline(xintercept=which(opiates$Year == '2008'), colour="grey", linetype="dashed") +
@@ -132,6 +137,8 @@ ggplot(others.m, aes(x=Year, y=value, group=variable, colour=variable)) +
   theme(panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
         legend.title = element_blank())
+
+#ggsave("DRD_implicated_drug2.png")
 
 
 ```
@@ -147,14 +154,14 @@ Table 4 describes quite a lot of data represented in different ways. Each is pre
 # read data
 table.dat = read_excel(xlfile, sheet = 6, col_names=FALSE)
 
-# extract core data and convert to numbers  there are some 
+# extract core data and convert to numbers  there are some
 # columns used as fillers. Gah!
 dat = table.dat[16:34,c(1,2,4,5,7:13,15:17)]
 dat = data.frame(apply(dat, 2, as.numeric))
 
 colnames(dat) <- c('Year','all','male','female','u14','15_24','25_34','35_44','45_54','55_64','o65','lq','median','uq')
 
-ggplot(dat, aes(x=Year, y=median)) + 
+ggplot(dat, aes(x=Year, y=median)) +
   ggtitle("Median Age at Death", subtitle = 'Shaded area represents the lower to upper quartile range of ages.') +
   ylab("Age") +
   geom_line(size=1.2) +
@@ -179,8 +186,9 @@ dat$Year = factor(dat$Year)
 dat.sex = dat[,c('Year','fempc','malpc')]
 dat.sex.m = melt(dat.sex)
 
-ggplot(dat.sex.m, aes(x=Year, y=value, group=variable, colour=variable)) + 
+ggplot(dat.sex.m, aes(x=Year, y=value, group=variable, colour=variable)) +
   ggtitle("Percentage of Male vs Female Deaths") +
+#  labs(caption="Males are mostly affected by drug-related deaths, but female deaths have increased since 2000") +
   ylab("Percentage Deaths") +
   geom_line(size=1.2) +
   ylim(c(10,90)) +
@@ -190,6 +198,9 @@ ggplot(dat.sex.m, aes(x=Year, y=value, group=variable, colour=variable)) +
   theme(panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
         legend.title = element_blank())
+
+#ggsave("mf_plot.png")
+
 ```
 
 Males are mostly affected by drug-related deaths, but females are increasing.
@@ -208,7 +219,7 @@ calc_percent <- function(x) {
 # read data
 table.dat = read_excel(xlfile, sheet = 6, col_names=FALSE)
 
-# extract male data and convert to numbers  there are some 
+# extract male data and convert to numbers  there are some
 # columns used as fillers. Gah!
 mdat = table.dat[45:63,c(1,4,5,7:9)]
 mdat = data.frame(apply(mdat, 2, as.numeric))
@@ -217,7 +228,7 @@ mdat = data.frame(apply(mdat, 2, as.numeric))
 mdat = data.frame(t(apply(mdat,1,calc_percent)))
 colnames(mdat) <- c('Year','u24','25-34','35-44','45-54','o55')
 
-# extract female data and convert to numbers  there are some 
+# extract female data and convert to numbers  there are some
 # columns used as fillers. Gah!
 fdat = table.dat[45:63,c(1,12:13,15:17)]
 fdat = data.frame(apply(fdat, 2, as.numeric))
@@ -235,6 +246,7 @@ dat.m = melt(dat)
 
 ggplot(dat.m, aes(x=Year, y=value, fill=variable)) +
   ggtitle('Deaths by Sex and Age') +
+#  labs(caption = "In 2000 deaths were largely in the under 35s.\nIn 2018 they are dominated by the 35 and over. Particluarly in females.") +
   ylab('Percentage Deaths') +
   geom_col() +
   facet_grid(Sex ~ .) +
@@ -246,7 +258,7 @@ ggplot(dat.m, aes(x=Year, y=value, fill=variable)) +
         strip.background = element_rect(fill='grey'),
         legend.title = element_blank())
 
-
+#ggsave("sex_age.png")
 ```
 
 In 2000 deaths were largely in the under 35s. In 2018 they are dominated by the 35 and over. Particluarly in females.
@@ -269,7 +281,7 @@ dat.m$Age = factor(dat.m$Age, levels = c('Under 25','25-34','35-44','45-54','55 
 age.totals = dat.m %>% group_by(Age,Sex) %>% summarise(Total = sum(value))
 
 
-ggplot(dat.m, aes(x=Age, y=value, fill=variable)) + 
+ggplot(dat.m, aes(x=Age, y=value, fill=variable)) +
   ggtitle("Drug-Related Deaths in Scotland", subtitle="By Sex, Age and Underlying Cause of Death") +
   ylab('No. Deaths') +
   geom_col() +
@@ -300,11 +312,11 @@ colnames(dat) <-c('Age','Heroin.morphine','Methadone','HeroinOST','Codeine', 'Di
 # combine the codeine/dihydrocodeine cols and remove
 dat = data.frame(dat, Codeines = as.numeric(dat$Codeine) + as.numeric(dat$Dihydrocodeine))
 
-# subtract the diazepam data from 
+# subtract the diazepam data from
 # the any prescsribed benzo data to make an "other pres benzo" column
 dat = data.frame(dat, "Otherpbenzo"=as.numeric(dat$Presbenzo) - as.numeric(dat$Diazepam))
 
-# similarly subtract etz for street benzo to 
+# similarly subtract etz for street benzo to
 # give other street benzo
 dat = data.frame(dat, "Othersbenzo"=as.numeric(dat$Streetbenzo) - as.numeric(dat$Etizolam))
 
@@ -320,7 +332,7 @@ dat.m = melt(dat, id=c('Age','Sex'))
 dat.m$value = as.numeric(dat.m$value)
 dat.m$Age = factor(dat.m$Age, levels = c('Under 25','25-34','35-44','45-54','55 and over'))
 
-ggplot(dat.m, aes(x=variable, y=value, fill=Age)) + 
+ggplot(dat.m, aes(x=variable, y=value, fill=Age)) +
   ggtitle("Drug-Related Deaths in Scotland", subtitle="By Sex, Age and Implicated Drug") +
   ylab('No. Deaths') +
   xlab('') +
@@ -362,12 +374,12 @@ dat = cbind(Year=factor(seq(2000,2017)), dat)
 # melt data and plot
 # note: dashed line is for average deaths 2012-2016 for ages 15-64
 dat.m = melt(dat, variable.name = "Age")
-ggplot(dat.m, aes(x=Year, y=value, group=Age, colour=Age)) + 
-  geom_hline(yintercept = yr5mean, colour="grey", linetype="dashed") + 
-  geom_line(size=1.2) + 
-  ylab("Deaths per 1000 population") + 
+ggplot(dat.m, aes(x=Year, y=value, group=Age, colour=Age)) +
+  geom_hline(yintercept = yr5mean, colour="grey", linetype="dashed") +
+  geom_line(size=1.2) +
+  ylab("Deaths per 1000 population") +
   annotate("text", label="Mean 2014-2018", x=16.8,y=yr5mean-0.015,size=3,colour="grey") +
-  scale_x_discrete(breaks=seq(2000,2018,2)) + 
+  scale_x_discrete(breaks=seq(2000,2018,2)) +
   scale_color_manual(values=myPalette) +
   ggtitle("Death Rates by Age") +
   theme_minimal() +
@@ -431,39 +443,164 @@ ggplot(change.dat, aes(x=Region, y=Change, fill="#D55E00")) +
   theme(panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank(),
         legend.position = "none")
-  
+
 
 
 ```
 
-## Table C1
+## Regional Comparisons 
 
-This is a test visualisation. 
-
-```{r tC1, fig.width=6, fig.height=7}
-
-## experiment with small multiples
+```{r tC1, fig.width=7}
 # read data
 table.dat = read_excel(xlfile, sheet = "C1 - summary", col_names=FALSE)
 
 # extract core data and convert to numbers
-dat = table.dat[10:41,1:12]
-colnames(dat) = c('Council',seq(2008,2018,1))
-dat$Council = c("Aberdeen", "Aberdeenshire", "Angus", "Argyll & Bute", "Edinburgh", "Clack'shire", "Dumfries & Ga.", "Dundee", "E. Ayrshire", "E. Dunb'shire", "E. Lothian", "E. Renf'shire", "Falkirk", "Fife", "Glasgow", "Highland", "Inverclyde", "Midlothian", "Moray", "Na h-Eil. Siar", "N. Ayrshire", "N. Lanarkshire", "Orkney Islands", "Perth & Kinross", "Renfrewshire", "Scot. Borders", "Shetland Islds", "South Ayrshire", "S. Lanarkshire", "Stirling", "W. Dunb'shire", "West Lothian")
+dat = table.dat[c(8,10:41),c(1:12,17)]
+dat = data.frame(dat[,1],apply(dat[,2:13], 2, as.numeric))
+names(dat) = c('Council',seq(2008,2018),'Pop')
+
+# calc DRD rate
+dat = cbind(dat, Rate = 1000000*dat$`2018`/dat$Pop)
+
+# remove whole-of-scotland data
+scot.dat = dat[1,]
+dat = dat[-1,]
+
+# order factors by DRD rate
+dat$Council = factor(dat$Council, levels=dat[order(dat$Rate),1])
+
+ggplot(dat, aes(x=Council, y=Rate, fill=factor(ifelse(dat$Council=="Dundee City", "Y","N")))) +
+  geom_col() +
+  ylim(c(0,480)) +
+  ggtitle("Drug-Related Deaths By Council Area", subtitle = "Per million population") +
+  ylab("Drug-Related Deaths (per million population)") +
+  labs(caption="Using 2016 population data") +
+  geom_hline(aes(yintercept=scot.dat$Rate), colour="#990000", linetype="dashed") +
+  geom_text(aes(label = round(Rate,1)), hjust=-0.1, size=2.5) +
+  scale_fill_manual(values=c('grey','orange'))+
+  annotate("text", label=sprintf("Scotland (%.1f)",scot.dat$Rate), x=4, y=scot.dat$Rate+7,colour="grey", angle=-90, size=2.5) +
+  coord_flip() +
+  theme_minimal() +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        legend.position = "none")
+#ggsave("TableC1.png")
+```
+
+
+```{r tC3, fig.height=10, fig.width=8}
+# read data
+table.dat = read_excel(xlfile, sheet = "C3 - drugs reported", col_names=FALSE)
+
+# extract core data and convert to numbers
+dat = table.dat[c(13:44),c(1:18)]
+councils = dat[,1]
+dat = data.frame(apply(dat[,2:18], 2, as.numeric))
+dat = data.frame(councils, dat)
+colnames(dat) <-c('Council','Totals','Heroin.morphine','Methadone','HeroinOST','Codeine', 'Dihydrocodeine', 'Any opiate', 'Anybenzo', 'Presbenzo', 'Diazepam', 'Streetbenzo', 'Etizolam', 'GabaPre', 'Cocaine', 'Ecstasy', 'Amphetamines', 'Alcohol')
+
+dat$Council = c("Aberdeen", "Abrdshr", "Angus", "Argyll", "Edinburgh", "Clk", "DnG", "Dundee", "E. Ayr", "E. Dun", "E. Loth", "E. Ren", "Falkirk", "Fife", "Glasgow", "Highland", "Inverclyde", "Midlothian", "Moray", "Na h-Eil", "N. Ayr", "N. Lankshr", "Orkney", "PnK", "Renfrshr", "SBord", "Shetld", "S. Ayr", "S. Lankshr", "Stirling", "W. Dun", "West Loth")
+
+dat = dat[dat$Totals > 40,]
+
+list.councils = dat$Council
+
+# combine the codeine/dihydrocodeine cols and remove
+dat = data.frame(dat, Codeines = as.numeric(dat$Codeine) + as.numeric(dat$Dihydrocodeine))
+
+# subtract the diazepam data from
+# the any prescsribed benzo data to make an "other pres benzo" column
+dat = data.frame(dat, "Otherpbenzo"=as.numeric(dat$Presbenzo) - as.numeric(dat$Diazepam))
+
+# similarly subtract etz for street benzo to
+# give other street benzo
+dat = data.frame(dat, "Othersbenzo"=as.numeric(dat$Streetbenzo) - as.numeric(dat$Etizolam))
+
+# remove uninterest columns:
+#   heroin or OST and any opiate are not very informative
+#   Codeine/dihydrocodeine unnecessary now as they've been combined
+#   any benzo is superceded by other benzos
+# individual cases)
+dat = dat[,c(1:4,11,13:21)]
+
+dat.pc = data.frame(dat$Council, 100*dat[,3:14]/dat$Totals)
+dat.pc.m = melt(dat.pc)
+
+drug_names = list(
+  'Heroin.morphine' = "Heroin or\nMorphine",
+  'Methadone' = 'Methadone',
+  'Diazepam' = "Diazepam",
+  'Etizolam' = 'Etizolam',
+  'GabaPre' = "Gabapentin or\nPregabalin",
+  'Cocaine' = 'Cocaine',
+  'Ecstasy' = 'Ecstasy',
+  'Amphetamines' = 'Amphetamines',
+  'Alcohol' = 'Alcohol',
+  'Codeines' = 'Codeines',
+  'Otherpbenzo' = "Other prescribed\nbenzodiazepines",
+  'Othersbenzo' = "Other 'street'\nbenzodiazepines"
+)
+drug_labeller = function(string) {
+  return(drug_names[string])
+}
+
+
+ggplot(dat.pc.m, aes(x=dat.Council, y=value, fill=factor(ifelse(dat.Council=="Dundee", "Y","N")))) +
+  ggtitle("Drug Implicated in Death", subtitle="For councils with >40 deaths") +
+  xlab("Council") +
+  ylab("Percentage Deaths") +
+  geom_col() +
+  geom_text(aes(label=sprintf("%.1f%%",value)), size=3, vjust=-0.5) +
+  scale_y_continuous(limits = c(0,100), breaks = c(0, 50, 100)) +
+  scale_fill_manual(values=c('grey','orange'))+
+  facet_grid(variable ~ ., labeller = labeller(variable=drug_labeller)) +
+  theme_minimal() +
+  theme(strip.text.y = element_text(angle = 0),
+        legend.position = "none")
+#ggsave("DRD_implicated_drug.png", height = 10, width= 8, units = 'in', dpi=150)
+
+```
+
+```{r tC4, fig.height=6}
+# read data
+table.dat = read_excel(xlfile, sheet = "C4 - rates by age-group", col_names=FALSE)
+
+# extract core data and convert to numbers
+dat = table.dat[c(11:42),c(1:6,8)]
+councils = dat[,1]
+dat = data.frame(apply(dat[,2:7], 2, as.numeric))
+dat = data.frame(councils, dat)
+colnames(dat) <-c('Council','15-24','25-34','35-44','45-54','55-64','AllAges')
+
+dat$Council = c("Aberdeen", "Abrdshr", "Angus", "Argyll", "Edinburgh", "Clk", "DnG", "Dundee", "E. Ayr", "E. Dun", "E. Loth", "E. Ren", "Falkirk", "Fife", "Glasgow", "Highland", "Inverclyde", "Midlothian", "Moray", "Na h-Eil", "N. Ayr", "N. Lankshr", "Orkney", "PnK", "Renfrshr", "SBord", "Shetld", "S. Ayr", "S. Lankshr", "Stirling", "W. Dun", "West Loth")
+
+dat = dat[dat$Council %in% list.councils,]
+
+all.ages = data.frame(dat$Council,round(dat$AllAges,2))
+names(all.ages) = c('Council', 'AllAges')
+
+dat = dat[,-7]
+
 dat.m = melt(dat)
 
-ggplot(dat.m, aes(x=variable, y=value, group=Council)) +
-  ggtitle("Drug-Related Deaths by Council") +
-  xlab('Year') +
-  ylab('No. Deaths') +
-  geom_line(size=1.1, colour='darkgreen') +
-  scale_x_discrete(breaks=c(2008, 2018), labels=c("'08","'18")) +
-  facet_wrap(~Council) +
+ggplot(dat.m, aes(x=variable, y=value, group=Council, colour=ifelse(Council == "Dundee", "A","B"))) +
+  ggtitle("Drug-Related Deaths per 1,000 population", subtitle = "By council area (annual average 2014-2018)") +
+  ylab("Death Rate") +
+  xlab("Age Group") +
+  geom_line() +
+  geom_point(size=1.6, colour="black") +
+  geom_point(size=0.8, colour='white') +
+  scale_y_continuous(limits = c(0, 1.4), breaks = c(0,0.4,0.8,1.2)) +
+  scale_colour_manual(values=c('orange','black')) +
+  geom_text(aes(label=round(value,2)), vjust = -0.6, size=2.4, colour="black") +
+  facet_grid(Council ~.) +
+  # tried to add the "All ages" average to the plots,
+  # got it looks too busy and tricky to format right. Removing for time being
+#  geom_hline(aes(yintercept=AllAges), data=all.ages, colour='grey',linetype='dashed') +
+#  geom_text(aes(x='55-64',y=AllAges, label=AllAges), data=all.ages, vjust=-0.6,hjust=-3, colour='grey', size=2.4) +
+#  geom_text(aes(x='55-64',y=AllAges, label='All ages'), data=all.ages, vjust=0.6,hjust=-2, colour='grey', size=2.4) +
   theme_minimal() +
-  theme(panel.background = element_rect(fill='#e0ecff'),
-        panel.grid.major.y = element_line(colour = 'grey'),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor = element_blank())
-  
-
+  theme(strip.text.y = element_text(angle=0),
+        legend.position = "none")
+#ggsave("DRD_age_group.png", height = 6, width= 6, units = 'in', dpi=150)
 ```
