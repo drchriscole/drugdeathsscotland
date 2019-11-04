@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/100367876.svg)](https://zenodo.org/badge/latestdoi/100367876)
+
 # Drug-related deaths in Scotland 2018
 
 A repository for analysing [National Records of Scotland](https://www.nrscotland.gov.uk/statistics-and-data/statistics/statistics-by-theme/vital-events/deaths/drug-related-deaths-in-scotland/2017) annual data on drug-related deaths in Scotland.
