@@ -12,7 +12,7 @@ Starting with the 2018 data there is substantially more regional detail which ma
 
 The MyBinder link a little fragile; for a given git commit one or either or both binder links work. *Caveat emptor*
 
-Rstudio: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/drchriscole/drugdeathsscotland/binder_test?filepath=rstudio)
+Rstudio: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/drchriscole/drugdeathsscotland/binder_test?urlpath=rstudio)
 
 This launches a full and working Rstudio environment to run the code interactively.
 
