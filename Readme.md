@@ -7,3 +7,9 @@ A repository for analysing [National Records of Scotland](https://www.nrscotland
 Primarily this is an exercise dataviz to improve on the hard-to-digest spreadsheet tables to improve on the understanding of themes and trends.
 
 Starting with the 2018 data there is substantially more regional detail which makes for a lot more analysis. As I'm based in Dundee, I've highlighted the serious problem that exists here.
+
+## MyBinder Jupyter Notebook testing
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/drchriscole/drugdeathsscotland/binder_test?filepath=DRD_in_Scotland_Visualisations.Rmd)
+
+The mybinder docker instance builds and loads except the ```readxl``` library isn't installed, which is kind of critical as none of the raw data be read. Need to investigate further...
