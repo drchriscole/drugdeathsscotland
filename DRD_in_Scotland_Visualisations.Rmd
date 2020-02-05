@@ -2,6 +2,18 @@
 output:
   pdf_document: default
   html_document: default
+jupyter:
+  kernelspec:
+    display_name: R
+    language: R
+    name: ir
+  language_info:
+    codemirror_mode: r
+    file_extension: .r
+    mimetype: text/x-r-source
+    name: R
+    pygments_lexer: r
+    version: 3.6.1
 ---
 
 ```{r setup, include=FALSE}
