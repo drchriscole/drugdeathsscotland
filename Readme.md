@@ -10,11 +10,13 @@ Starting with the 2018 data there is substantially more regional detail which ma
 
 ## MyBinder Jupyter Notebook testing
 
-Rstudio [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/drchriscole/drugdeathsscotland/binder_test?filepath=rstudio)
+The MyBinder link a little fragile; for a given git commit one or either or both binder links work. *Caveat emptor*
+
+Rstudio: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/drchriscole/drugdeathsscotland/binder_test?filepath=rstudio)
 
 This launches a full and working Rstudio environment to run the code interactively.
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/drchriscole/drugdeathsscotland/binder_test?filepath=DRD_in_Scotland_Visualisations.Rmd)
+Rmarkdown: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/drchriscole/drugdeathsscotland/binder_test?filepath=DRD_in_Scotland_Visualisations.Rmd)
 
-The mybinder docker instance builds and loads except the ```readxl``` library isn't installed, which is kind of critical as none of the raw data be read. Need to investigate further...
+This launches an interactive notebook of the markdown.
 
