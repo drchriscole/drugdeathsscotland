@@ -16,5 +16,5 @@ This launches a full and working Rstudio environment to run the code interactive
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/drchriscole/drugdeathsscotland/master?filepath=DRD_in_Scotland_Visualisations.Rmd)
 
-The mybinder docker instance builds and loads except the ```readxl``` library isn't installed, which is kind of critical as none of the raw data be read. Need to investigate further...
+The mybinder docker instance builds and loads except the ```forcats``` library isn't installed. A minor issue as only one plot is dependent on it.
 
