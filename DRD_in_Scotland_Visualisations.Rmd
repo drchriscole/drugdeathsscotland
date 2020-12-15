@@ -199,6 +199,8 @@ ggplot(dat, aes(x=Year, y=median)) +
   theme(panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
         legend.title = element_blank())
+
+ggsave('DRD_median_age.png')
 ```
 
 
@@ -419,10 +421,10 @@ ggplot(dat.m, aes(x=Year, y=value, group=Age, colour=Age)) +
         panel.grid.minor.x = element_blank())
 
 
-
+ggsave('DRD_age_rates.png')
 ```
 
-## Table HB1
+## Regional Changes - Table HB1
 
 ```{r tHB1}
 # read data
@@ -451,6 +453,8 @@ ggplot(dat, aes(x=Region, y=`2009`)) +
   xlab('') +
   coord_flip() +
   theme_minimal()
+
+ggsave('DRD_region_change.png')
 ```
 
 ```{r tHBb}
@@ -498,7 +502,7 @@ ggplot(change.dat, aes(x=fct_reorder(Region, PcChange), y=PcChange, fill="#D55E0
 
 ```
 
-## Regional Comparisons 
+## Council Comparisons 
 
 ```{r tC1a, fig.height = 6}
 
