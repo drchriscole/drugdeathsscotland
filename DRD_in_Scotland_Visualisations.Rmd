@@ -1,7 +1,7 @@
 ---
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 jupyter:
   kernelspec:
     display_name: R
@@ -23,7 +23,8 @@ library(readxl)
 library(reshape2)
 library(ggplot2)
 library(dplyr)
-#library(forcats)
+library(forcats)
+library(tidyr)
 
 # default region colours
 reg.colours = c("#4D4D4D", "#AEAEAE")
@@ -688,3 +689,34 @@ ggplot(dat.m, aes(x=variable, y=value, group=Council, colour=ifelse(Council == "
         legend.position = "none")
 #ggsave("DRD_age_group.png", height = 6, width= 6, units = 'in', dpi=150)
 ```
+
+## Different Definitions
+
+```{r tx}
+
+# read data
+tableX.dat = read_excel(xlfile, sheet = "X - diff defs", col_names=FALSE)
+
+# extract core data and convert to numbers
+dat.num = tableX.dat[c(44:53),c(1:4)]
+colnames(dat.num) = c('Year','NRS','ONS','EMCDDA')
+dat.num.l = dat.num %>% gather(Method, Counts, -Year)
+
+ggplot(dat.num.l, aes(x = Year, y = as.numeric(Counts), group = Method, colour = Method)) +
+  geom_line() +
+  geom_point(data = dat.num.l %>% filter(Year == '2019')) +
+  geom_text(data = dat.num.l %>% filter(Year == '2019'), aes(label = as.numeric(Counts)), colour = 'grey4', size = 2.4, hjust = -0.2) +
+  scale_color_manual(values = myPalette) +
+#  scale_x_discrete(breaks = ybreaks) +
+  labs(title = 'Drug-Related Deaths in Scotland',
+       subtitle = 'Comparison of different national definitions',
+       x = '',
+       y = 'No. Deaths') +
+  theme_minimal() +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        legend.title = element_blank())
+
+
+```
+
