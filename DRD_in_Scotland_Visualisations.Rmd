@@ -23,7 +23,7 @@ library(readxl)
 library(reshape2)
 library(ggplot2)
 library(dplyr)
-library(forcats)
+#library(forcats)
 
 # default region colours
 reg.colours = c("#4D4D4D", "#AEAEAE")
