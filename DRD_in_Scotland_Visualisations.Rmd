@@ -39,6 +39,8 @@ ybreaks = seq(2001,2019,2)
 # read data - download first as read_excel() can't do URLs
 xlfile = tempfile(fileext = '.xlsx')
 download.file("https://www.nrscotland.gov.uk/files//statistics/drug-related-deaths/2019/drug-related-deaths-19-tabs-figs.xlsx", xlfile, mode="wb")
+xlfile2 = tempfile(fileext = '.xlsx')
+download.file("https://www.nrscotland.gov.uk/files//statistics/drug-related-deaths/2018/drd-comparison-with-other-countries-2016-2018.xlsx", xlfile2, mode="wb")
 
 ```
 
@@ -719,6 +721,51 @@ ggplot(dat.num.l, aes(x = Year, y = as.numeric(Counts), group = Method, colour =
 
 
 ```
+
+## UK Nations Comparison
+
+```{r uk}
+
+# read region std def data spreadsheet
+table2.dat = read_excel(xlfile2, sheet = 3, col_names=FALSE)
+
+# extract data and convert to numbers
+dat.std = table2.dat[c(26:28,30,31),c(1,3:5)]
+names(dat.std) <- c('Country','2016','2017','2018')
+dat.std$`2017` = as.numeric(dat.std$`2017`)
+dat.std$defn = 'NRS'
+
+# read region ONS def data spreadsheet
+table2.dat = read_excel(xlfile2, sheet = 4, col_names=FALSE)
+
+# extract data and convert to numbers
+dat.ons = table2.dat[c(26:28,30,31),c(1,3:5)]
+names(dat.ons) <- c('Country','2016','2017','2018')
+dat.ons$`2016` = as.numeric(dat.ons$`2016`)
+dat.ons$defn = 'ONS'
+
+dat = rbind(dat.std, dat.ons)
+dat.l = dat %>% gather(year, perm, `2016`:`2018`)
+
+ggplot(dat.l, aes(x = year, y = perm, group=Country, colour=Country, linetype = ifelse(Country == 'UK', 'a', 'b'))) +
+  labs(title = 'Drug-Related Deaths in the UK',
+       subtitle = 'Comparison of different definitions',
+       x = '',
+       y = 'Deaths per million population') +
+  geom_line() +
+#  geom_line(data = dat.l[dat.l$Country == 'UK',], aes(x = year, y = perm), colour = 'black') +
+  ylim(c(0,250)) +
+  scale_colour_manual(values = myPalette) +
+  scale_linetype_manual(values = c( 'dashed', 'solid'), guide = FALSE) +
+  facet_grid(. ~ defn) +
+  theme_minimal() +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        legend.title = element_blank())
+
+
+```
+
 
 ## European Comparison
 
