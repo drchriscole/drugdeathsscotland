@@ -720,3 +720,52 @@ ggplot(dat.num.l, aes(x = Year, y = as.numeric(Counts), group = Method, colour =
 
 ```
 
+## European Comparison
+
+```{r emcdda}
+
+# read data
+tableEU.dat = read_excel(xlfile, sheet = "EMCDDA - drug-induced deaths", col_names=FALSE)
+
+# extract core data and convert to numbers
+dat = tableEU.dat[c(11:39),c(1,4,6)]
+colnames(dat) = c('Country','Number','PerM')
+
+# drop Greece as there's no data
+dat = dat %>% filter(Country != 'Greece')
+dat$Number = as.numeric(dat$Number)
+dat$PerM = as.numeric(dat$PerM)
+#dat.num.l = dat.num %>% gather(Method, Counts, -Year)
+
+# get Scotland data
+scot = tableEU.dat[c(47:49),c(2,4,6)]
+colnames(scot) = c('Country','Number','PerM')
+scot$Country = c('Scot - likeUK', 'Scot - likeEU', 'Scot - Newest')
+scot$PerM = as.numeric(scot$PerM)
+
+# join with other data
+dat = rbind(dat, scot)
+
+# fix names
+dat[dat$Country == 'United Kingdom3', 'Country'] <- 'UK'
+
+# define colour categories
+dat$Category = c(rep('A', 27), 'B', rep('C', 3))
+
+ggplot(dat, aes(x = fct_reorder(Country,PerM), y = PerM, fill=Category)) + 
+  labs(title = "Drug-Related Deaths in Scotland 2019",
+       subtitle = "Comparison with EU countries",
+       y = 'Deaths per million population',
+       x = '') +
+  geom_col() +
+  geom_text(aes(label = PerM), hjust = ifelse(dat$PerM < 4, -0.6, 1.2), colour = ifelse(dat$Category == 'A', 'grey4', 'white'), size = 2) +
+  coord_flip() +
+  scale_fill_manual(values = c('grey', 'darkred', '#0A4FAF')) +
+  theme_minimal() +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        legend.position = 'NA')
+
+
+```
+
