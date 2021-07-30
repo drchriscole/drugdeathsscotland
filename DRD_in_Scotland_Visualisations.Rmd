@@ -1,7 +1,7 @@
 ---
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 jupyter:
   kernelspec:
     display_name: R
@@ -34,21 +34,21 @@ myPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2",
 
 # breaks for y-axis line graphs
 
-ybreaks = seq(2001,2019,2)
+ybreaks = seq(2001,2020,2)
 
 # read data - download first as read_excel() can't do URLs
 xlfile = tempfile(fileext = '.xlsx')
-download.file("https://www.nrscotland.gov.uk/files//statistics/drug-related-deaths/2019/drug-related-deaths-19-tabs-figs.xlsx", xlfile, mode="wb")
+download.file("https://www.nrscotland.gov.uk/files//statistics/drug-related-deaths/20/drug-related-deaths-20-tabs-figs.xlsx", xlfile, mode="wb")
 xlfile2 = tempfile(fileext = '.xlsx')
 download.file("https://www.nrscotland.gov.uk/files//statistics/drug-related-deaths/2018/drd-comparison-with-other-countries-2016-2018.xlsx", xlfile2, mode="wb")
 
 ```
 
-# Drug-Related Deaths in Scotland 2019 {.tabset}
+# Drug-Related Deaths in Scotland 2020 {.tabset}
 
-Annual data is published on drug-related deaths (DRDs) in Scotland by the [National Records of Scotland](https://www.nrscotland.gov.uk/statistics-and-data/statistics/statistics-by-theme/vital-events/deaths/drug-related-deaths-in-scotland). The 2019 data was published on 15th December 2020.
+Annual data is published on drug-related deaths (DRDs) in Scotland by the [National Records of Scotland](https://www.nrscotland.gov.uk/statistics-and-data/statistics/statistics-by-theme/vital-events/deaths/drug-related-deaths-in-scotland). The 2020 data was published on 30th July 2021.
 
-A collection of visualisations of the [2019 data](https://www.nrscotland.gov.uk/files//statistics/drug-related-deaths/2019/drug-related-deaths-19-tabs-figs.xlsx) are presented here for those interested in exploring the trends or patterns in the data. Little to no commentary is provided on what the data show.
+A collection of visualisations of the [2020 data](https://www.nrscotland.gov.uk/files//statistics/drug-related-deaths/20/drug-related-deaths-20-tabs-figs.xlsx) are presented here for those interested in exploring the trends or patterns in the data. Little to no commentary is provided on what the data show.
 
 Each table from the data are presented separately by one or more charts. Not all tables are represented here mostly because the data has already been presented in the raw data already.
 
@@ -58,10 +58,10 @@ All analyses and code are available on [github](https://github.com/drchriscole/d
 
 ```{r t2}
 # read data
-table2.dat = read_excel(xlfile, sheet = 4, col_names=FALSE)
+table2.dat = read_excel(xlfile, sheet = '2 - causes', col_names=FALSE)
 
 # extract core data and convert to numbers
-dat = table2.dat[39:47,c(1,3:7)]
+dat = table2.dat[40:49,c(1,3:7)]
 dat = data.frame(apply(dat, 2, as.numeric))
 
 # add colnames
@@ -93,10 +93,10 @@ ggplot(dat.m, aes(x=Year, y=value, fill=variable)) +
 
 ```{r t3, fig.width=7}
 # read data
-table.dat = read_excel(xlfile, sheet = 5, col_names=FALSE)
+table.dat = read_excel(xlfile, sheet = '3 - drugs reported', col_names=FALSE)
 
 # extract core data and convert to numbers
-dat = table.dat[18:37,c(1,3:18)]
+dat = table.dat[18:38,c(1,3:18)]
 dat = data.frame(apply(dat, 2, as.numeric))
 
 colnames(dat) <- c('Year','Heroin.morphine','Methadone','HeroinOST','Codeine', 'Dihydrocodeine', 'Any opiate', 'Anybenzo', 'Presbenzo', 'Diazepam', 'Streetbenzo', 'Etizolam', 'GabaPre', 'Cocaine', 'Ecstasy', 'Amphetamines', 'Alcohol')
@@ -132,7 +132,7 @@ ggplot(opiates.m, aes(x=Year, y=value, group=variable, colour=variable)) +
        x = '',
        y = "No. of Deaths") +
 #  labs(caption = "Data prior to 2008 uses a different definition than the data from 2008.") +
-  ylim(c(0,800)) +
+  ylim(c(0,850)) +
   geom_vline(xintercept=which(opiates$Year == '2008'), colour="grey", linetype="dashed") +
   geom_line(size=1.1) +
   scale_color_manual(values = myPalette, labels = c('Heroin or Morphine','Methadone','Diazepam','Etizolam','Codeines','Other prescribed \nbenzodiazepines','Other street\nbenzodiazipnes')) +
@@ -155,7 +155,7 @@ ggplot(others.m, aes(x=Year, y=value, group=variable, colour=variable)) +
        x = '',
        y = "No. of Deaths") +
 #  labs(caption = "Data prior to 2008 uses a different definition than the data from 2008.") +
-  ylim(c(0,800)) +
+  ylim(c(0,850)) +
   geom_vline(xintercept=which(opiates$Year == '2008'), colour="grey", linetype="dashed") +
   geom_line(size=1.1) +
   scale_color_manual(values = myPalette, labels = c('Gabapentin or\nPregabalin','Cocaine','Ecstasy','Amphetamines','Alcohol')) +
@@ -179,11 +179,11 @@ Table 4 describes quite a lot of data represented in different ways. Each is pre
 
 ```{r t4a}
 # read data
-table.dat = read_excel(xlfile, sheet = 6, col_names=FALSE)
+table.dat = read_excel(xlfile, sheet = '4 - sex and age', col_names=FALSE)
 
 # extract core data and convert to numbers  there are some
 # columns used as fillers. Gah!
-dat = table.dat[16:35,c(1,2,4,5,7:13,15:17)]
+dat = table.dat[16:36,c(1,2,4,5,7:13,16:18)]
 dat = data.frame(apply(dat, 2, as.numeric))
 
 colnames(dat) <- c('Year','all','male','female','u14','15_24','25_34','35_44','45_54','55_64','o65','lq','median','uq')
@@ -203,12 +203,12 @@ ggplot(dat, aes(x=Year, y=median)) +
         panel.grid.minor.x = element_blank(),
         legend.title = element_blank())
 
-ggsave('DRD_median_age.png')
+#ggsave('DRD_median_age.png')
 ```
 
 
 
-Median age of drug-related death is increasing from 30 in 2000 to 42 in 2019.
+Median age of drug-related death is increasing from 30 in 2000 to 43 in 2020.
 
 ```{r t4b}
 # calc percentage m/f deaths
@@ -251,11 +251,11 @@ calc_percent <- function(x) {
 }
 
 # read data
-table.dat = read_excel(xlfile, sheet = 6, col_names=FALSE)
+table.dat = read_excel(xlfile, sheet = '4 - sex and age', col_names=FALSE)
 
 # extract male data and convert to numbers  there are some
 # columns used as fillers. Gah!
-mdat = table.dat[46:65,c(1,4,5,7:9)]
+mdat = table.dat[47:67,c(5,8:12)]
 mdat = data.frame(apply(mdat, 2, as.numeric))
 
 # turn into percentages
@@ -264,7 +264,7 @@ colnames(mdat) <- c('Year','u24','25-34','35-44','45-54','o55')
 
 # extract female data and convert to numbers  there are some
 # columns used as fillers. Gah!
-fdat = table.dat[46:65,c(1,12:13,15:17)]
+fdat = table.dat[47:67,c(5,16:20)]
 fdat = data.frame(apply(fdat, 2, as.numeric))
 
 # turn into percentages
@@ -296,13 +296,13 @@ ggplot(dat.m, aes(x=Year, y=value, fill=variable)) +
 #ggsave("sex_age.png")
 ```
 
-In 2000 deaths were largely in the under 35s. In 2019 they are dominated by the 35 and over. 
+In 2000 deaths were largely in the under 35s. In 2020 they are dominated by the 35 and over. 
 
 ## Table 5
 
 ```{r t5, fig.width=5.5, fig.height=6.5}
 # read data
-table.dat = read_excel(xlfile, sheet = 7, col_names=FALSE)
+table.dat = read_excel(xlfile, sheet = '5 - sex age cause', col_names=FALSE)
 
 # extract core data and convert to numbers
 dat = table.dat[c(22:26,29:33),c(1,3:5,7)]
@@ -338,7 +338,7 @@ ggplot(dat.m, aes(x=Age, y=value, fill=variable)) +
 ```{r t6, fig.width=6, fig.height=5}
 
 # read data
-table.dat = read_excel(xlfile, sheet = 8, col_names=FALSE)
+table.dat = read_excel(xlfile, sheet = '6 - sex, age and drugs', col_names=FALSE)
 
 # extract core data and convert to numbers
 dat = table.dat[c(26:30,33:37),c(1,3:18)]
@@ -393,18 +393,18 @@ NB: Totals in this chart will be higher than total number of deaths as deaths ca
 
 ```{r t8}
 # read data
-table8.dat = read_excel(xlfile, sheet = 10, col_names=FALSE)
+table8.dat = read_excel(xlfile, sheet = '8 - death rates by age', col_names=FALSE)
 
 # extract core data and convert to numbers
-dat = table8.dat[11:30,2:6]
+dat = table8.dat[11:31,2:6]
 dat = data.frame(apply(dat, 2, as.numeric))
 
 # extract mean for last five years
-yr5mean = as.numeric(table8.dat[32,7])
+yr5mean = as.numeric(table8.dat[33,7])
 
 # add labels
 names(dat) <- c("15-24","25-34","35-44","45-54","55-64")
-dat = cbind(Year=factor(seq(2000,2019)), dat)
+dat = cbind(Year=factor(seq(2000,2020)), dat)
 
 # melt data and plot
 # note: dashed line is for average deaths 2012-2016 for ages 15-64
@@ -415,16 +415,16 @@ ggplot(dat.m, aes(x=Year, y=value, group=Age, colour=Age)) +
   annotate("text", label="5-year Mean", x=2.5,y=yr5mean+0.02,size=3,colour="grey") +
   scale_x_discrete(breaks=ybreaks) +
   scale_color_manual(values=myPalette) +
-  labs(title = "Drug-Related Deaths in Scotland 2019",
+  labs(title = "Drug-Related Deaths in Scotland 2020",
        subtitle = "Rates by Age",
        x = '',
-       y = 'Deaths per 1,000 population') +
+       y = 'Deaths per 100,000 population') +
   theme_minimal() +
   theme(panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank())
 
 
-ggsave('DRD_age_rates.png')
+#ggsave('DRD_age_rates.png')
 ```
 
 ## Regional Changes - Table HB1
@@ -434,8 +434,10 @@ ggsave('DRD_age_rates.png')
 table.dat = read_excel(xlfile, sheet = "HB1 - summary", col_names=FALSE)
 
 # extract core data and convert to numbers
+startyr = 2010
+endyr = 2020
 dat = table.dat[14:27,1:12]
-colnames(dat) = c('Region', seq(2009,2019,1))
+colnames(dat) = c('Region', seq(startyr,endyr,1))
 dat[dat$Region == 'Highland 3' , 1] = 'Highland'
 dat[dat$Region == 'Greater Glasgow & Clyde 3' , 1] = 'Greater Glasgow & Clyde'
 
@@ -443,21 +445,21 @@ dat$Region = factor(dat$Region, c(dat[order(dat$`2019`),]$Region))
 
 dat.m = melt(dat)
 
-ggplot(dat, aes(x=Region, y=`2009`)) +
-  ggtitle("Drug-Related Deaths in Scotland", subtitle="Change between 2009 - 2019") +
-  geom_linerange(aes(ymin=`2009`,ymax=`2019`), colour='grey', size=1.5) +
-  geom_point(aes(y=`2009`), size =1.2, colour='orange') +
-  geom_point(aes(y=`2019`), size =1.2, colour='orange') +
-  geom_point(aes(y=`2018`), size =1.2, colour='darkgreen') +
-  geom_text(aes(y=`2018`, label = ifelse(Region == "Greater Glasgow & Clyde", '2018', '')), vjust = 1.4, size=2.2, colour="grey30") +
-  geom_text(aes(y=`2009`, label = ifelse(Region == "Greater Glasgow & Clyde", '2009', '')), vjust = -0.5, size=2.6, colour="grey30") +
-  geom_text(aes(y=`2019`, label = ifelse(Region == "Greater Glasgow & Clyde", '2019', '')), vjust = -0.5, size=2.6, colour="grey30") +
+ggplot(dat, aes(x=Region, y=`startyr`)) +
+  ggtitle("Drug-Related Deaths in Scotland", subtitle="Change between 2010 - 2020") +
+  geom_linerange(aes(ymin=`2010`,ymax=`2020`), colour='grey', size=1.5) +
+  geom_point(aes(y=`2010`), size =1.2, colour='orange') +
+  geom_point(aes(y=`2020`), size =1.2, colour='orange') +
+  geom_point(aes(y=`2019`), size =1.2, colour='darkgreen') +
+  geom_text(aes(y=`2019`, label = ifelse(Region == "Greater Glasgow & Clyde", '2019', '')), vjust = 1.4, size=2.2, colour="grey30") +
+  geom_text(aes(y=`2010`, label = ifelse(Region == "Greater Glasgow & Clyde", '2010', '')), vjust = -0.5, size=2.6, colour="grey30") +
+  geom_text(aes(y=`2020`, label = ifelse(Region == "Greater Glasgow & Clyde", '2020', '')), vjust = -0.5, size=2.6, colour="grey30") +
   ylab('No. Deaths') +
   xlab('') +
   coord_flip() +
   theme_minimal()
 
-ggsave('DRD_region_change.png')
+#ggsave('DRD_region_change.png')
 ```
 
 ```{r tHBb}
@@ -466,7 +468,7 @@ ggsave('DRD_region_change.png')
 #dat = dat[dat$`2017` > 5,]
 
 # do percentage change between 2018 & 2019
-change.dat = data.frame(Region = dat$Region, Change = dat$`2019` - dat$`2018`, PcChange = round(100*(dat$`2019` - dat$`2018`)/dat$`2018`,1))
+change.dat = data.frame(Region = dat$Region, Change = dat$`2020` - dat$`2019`, PcChange = round(100*(dat$`2020` - dat$`2019`)/dat$`2019`,1))
 
 # remove non-finite data
 change.dat[!is.finite(change.dat$PcChange), 'PcChange'] <- NA
@@ -474,7 +476,7 @@ change.dat[!is.finite(change.dat$PcChange), 'PcChange'] <- NA
 change.dat$Region = factor(change.dat$Region, levels = change.dat[order(change.dat$Change),]$Region)
 
 ggplot(change.dat, aes(x=Region, y=Change, fill="#D55E00")) +
-  labs(title = "Drug-Related Deaths in Scotland 2019", 
+  labs(title = "Drug-Related Deaths in Scotland 2020", 
        subtitle="Year-on-year change by NHS health board",
        x = '',
        y = "Change in No. Deaths") +
@@ -488,12 +490,12 @@ ggplot(change.dat, aes(x=Region, y=Change, fill="#D55E00")) +
         legend.position = "none")
 
 ggplot(change.dat, aes(x=fct_reorder(Region, PcChange), y=PcChange, fill="#D55E00")) +
-  labs(title = "Drug-Related Deaths in Scotland 2019", 
+  labs(title = "Drug-Related Deaths in Scotland 2020", 
        subtitle="Year-on-year change by NHS health board",
        x = '',
        y = "Change in Deaths (%)") +
   geom_col() +
-  ylim(c(-125,100)) +
+  ylim(c(-125,210)) +
   coord_flip() +
   geom_text(aes(label = sprintf("%+.1f%%",PcChange)), hjust = ifelse(change.dat$PcChange > 0, -0.2, 1.1), size=3) +
   theme_minimal() +
@@ -514,17 +516,19 @@ ggplot(change.dat, aes(x=fct_reorder(Region, PcChange), y=PcChange, fill="#D55E0
 table.dat = read_excel(xlfile, sheet = "C1 - summary", col_names=FALSE)
 
 # extract core data and convert to numbers
+startyr = 2010
+endyr = 2020
 dat = table.dat[10:41,1:12]
-colnames(dat) = c('Council',seq(2009,2019,1))
+colnames(dat) = c('Council',seq(startyr,endyr,1))
 dat$Council = c("Aberdeen", "Aberdeenshire", "Angus", "Argyll & Bute", "Edinburgh", "Clack'shire", "Dumfries & Ga.", "Dundee", "E. Ayrshire", "E. Dunb'shire", "E. Lothian", "E. Renf'shire", "Falkirk", "Fife", "Glasgow", "Highland", "Inverclyde", "Midlothian", "Moray", "Na h-Eil. Siar", "N. Ayrshire", "N. Lanarkshire", "Orkney Islands", "Perth & Kinross", "Renfrewshire", "Scot. Borders", "Shetland Islds", "South Ayrshire", "S. Lanarkshire", "Stirling", "W. Dunb'shire", "West Lothian")
 dat.m = melt(dat)
 
 ggplot(dat.m, aes(x=variable, y=value, group=Council, colour=ifelse(dat.m$Council == "Dundee", "A","B"))) +
-  ggtitle("Drug-Related Deaths in Scotland by Council 2009-2019") +
+  ggtitle(sprintf("Drug-Related Deaths in Scotland by Council %d-%d",startyr,endyr)) +
   xlab('Year') +
   ylab('No. Deaths') +
   geom_line(size=1.1) +
-  scale_x_discrete(breaks=c(2009, 2019), labels=c("'09","'19")) +
+  scale_x_discrete(breaks=c(startyr, endyr), labels=c("'10","'20")) +
   scale_colour_manual(values=c('orange','grey')) +
   facet_wrap(~Council) +
   theme_minimal() +
@@ -543,10 +547,10 @@ table.dat = read_excel(xlfile, sheet = "C1 - summary", col_names=FALSE)
 # extract core data and convert to numbers
 dat = table.dat[c(8,10:41),c(1:12,17)]
 dat = data.frame(dat[,1],apply(dat[,2:13], 2, as.numeric))
-names(dat) = c('Council',seq(2009,2019),'Pop')
+names(dat) = c('Council',seq(startyr,endyr),'Pop')
 
 # calc DRD rate
-dat = cbind(dat, Rate = 1000000*dat$`2019`/dat$Pop)
+dat = cbind(dat, Rate = 1000000*dat$`2020`/dat$Pop)
 
 # remove whole-of-scotland data
 scot.dat = dat[1,]
@@ -558,10 +562,10 @@ dat$Council = factor(dat$Council, levels=dat[order(dat$Rate),1])
 ggplot(dat, aes(x=Council, y=Rate, fill=factor(ifelse(dat$Council=="Dundee City", "Y","N")))) +
   geom_col() +
   ylim(c(0,490)) +
-  ggtitle("Drug-Related Deaths in Scotland 2019", 
+  ggtitle(sprintf("Drug-Related Deaths in Scotland %d", endyr), 
           subtitle = "By council per million population") +
   ylab("Drug-Related Deaths (per million population)") +
-  labs(caption="Using 2017 population data") +
+  labs(caption="Using 2018 population data") +
   geom_hline(aes(yintercept=scot.dat$Rate), colour="#990000", linetype="dashed") +
   geom_text(aes(label = round(Rate,1)), hjust=-0.1, size=2.5) +
   scale_fill_manual(values=c('grey','orange'))+
@@ -577,7 +581,7 @@ ggplot(dat, aes(x=Council, y=Rate, fill=factor(ifelse(dat$Council=="Dundee City"
 
 ```{r tC3, fig.height=10, fig.width=8}
 # read data
-table.dat = read_excel(xlfile, sheet = "C3 - drugs reported", col_names=FALSE)
+table.dat = read_excel(xlfile, sheet = "C3 - drugs implicated", col_names=FALSE)
 
 # extract core data and convert to numbers
 dat = table.dat[c(13:44),c(1:18)]
@@ -671,15 +675,15 @@ dat = dat[,-7]
 dat.m = melt(dat)
 
 ggplot(dat.m, aes(x=variable, y=value, group=Council, colour=ifelse(Council == "Dundee", "A","B"))) +
-  ggtitle("Drug-Related Deaths in Scotland per 1,000 population", subtitle = "By council area (annual average 2015-2019)") +
+  ggtitle("Drug-Related Deaths in Scotland per 100,000 population", subtitle = "By council area (annual average 2016-2020)") +
   ylab("Death Rate") +
   xlab("Age Group") +
   geom_line() +
   geom_point(size=1.6, colour="black") +
   geom_point(size=0.8, colour='white') +
-  scale_y_continuous(limits = c(0, 1.4), breaks = c(0,0.4,0.8,1.2)) +
+  scale_y_continuous(limits = c(0, 150), breaks = c(0,50,100,150)) +
   scale_colour_manual(values=c('orange','black')) +
-  geom_text(aes(label=round(value,2)), vjust = ifelse(dat.m$value < 1.3, -0.6, 1.4), size=2.4, colour="black") +
+  geom_text(aes(label=round(value,0)), vjust = ifelse(dat.m$value < 140, -0.6, 1.4), size=2.4, colour="black") +
   facet_grid(Council ~.) +
   # tried to add the "All ages" average to the plots,
   # got it looks too busy and tricky to format right. Removing for time being
@@ -700,14 +704,14 @@ ggplot(dat.m, aes(x=variable, y=value, group=Council, colour=ifelse(Council == "
 tableX.dat = read_excel(xlfile, sheet = "X - diff defs", col_names=FALSE)
 
 # extract core data and convert to numbers
-dat.num = tableX.dat[c(44:53),c(1:4)]
+dat.num = tableX.dat[c(44:54),c(1:4)]
 colnames(dat.num) = c('Year','NRS','ONS','EMCDDA')
 dat.num.l = dat.num %>% gather(Method, Counts, -Year)
 
 ggplot(dat.num.l, aes(x = Year, y = as.numeric(Counts), group = Method, colour = Method)) +
   geom_line() +
-  geom_point(data = dat.num.l %>% filter(Year == '2019')) +
-  geom_text(data = dat.num.l %>% filter(Year == '2019'), aes(label = as.numeric(Counts)), colour = 'grey4', size = 2.4, hjust = -0.2) +
+  geom_point(data = dat.num.l %>% filter(Year == '2020')) +
+  geom_text(data = dat.num.l %>% filter(Year == '2020'), aes(label = as.numeric(Counts)), colour = 'grey4', size = 2.4, hjust = -0.2) +
   scale_color_manual(values = myPalette) +
 #  scale_x_discrete(breaks = ybreaks) +
   labs(title = 'Drug-Related Deaths in Scotland',
@@ -723,6 +727,8 @@ ggplot(dat.num.l, aes(x = Year, y = as.numeric(Counts), group = Method, colour =
 ```
 
 ## UK Nations Comparison
+
+*Note:* Not updated since August 2019
 
 ```{r uk}
 
@@ -775,17 +781,17 @@ ggplot(dat.l, aes(x = year, y = perm, group=Country, colour=Country, linetype = 
 tableEU.dat = read_excel(xlfile, sheet = "EMCDDA - drug-induced deaths", col_names=FALSE)
 
 # extract core data and convert to numbers
-dat = tableEU.dat[c(11:39),c(1,4,6)]
+dat = tableEU.dat[c(13:40),c(1,4,6)]
 colnames(dat) = c('Country','Number','PerM')
 
 # drop Greece as there's no data
-dat = dat %>% filter(Country != 'Greece')
+dat = dat %>% filter(Country != 'Germany')
 dat$Number = as.numeric(dat$Number)
 dat$PerM = as.numeric(dat$PerM)
 #dat.num.l = dat.num %>% gather(Method, Counts, -Year)
 
 # get Scotland data
-scot = tableEU.dat[c(47:49),c(2,4,6)]
+scot = tableEU.dat[c(50,52,53),c(2,4,6)]
 colnames(scot) = c('Country','Number','PerM')
 scot$Country = c('Scot - likeUK', 'Scot - likeEU', 'Scot - Newest')
 scot$PerM = as.numeric(scot$PerM)
@@ -794,13 +800,13 @@ scot$PerM = as.numeric(scot$PerM)
 dat = rbind(dat, scot)
 
 # fix names
-dat[dat$Country == 'United Kingdom3', 'Country'] <- 'UK'
+dat[dat$Country == 'European Union  2', 'Country'] <- 'EU'
 
 # define colour categories
-dat$Category = c(rep('A', 27), 'B', rep('C', 3))
+dat$Category = c(rep('A', 26), 'B', rep('C', 3))
 
 ggplot(dat, aes(x = fct_reorder(Country,PerM), y = PerM, fill=Category)) + 
-  labs(title = "Drug-Related Deaths in Scotland 2019",
+  labs(title = "Drug-Related Deaths in Scotland 2020",
        subtitle = "Comparison with EU countries",
        y = 'Deaths per million population',
        x = '') +
