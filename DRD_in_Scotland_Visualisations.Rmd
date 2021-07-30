@@ -446,7 +446,7 @@ dat$Region = factor(dat$Region, c(dat[order(dat$`2019`),]$Region))
 
 dat.m = melt(dat)
 
-ggplot(dat, aes(x=Region, y=`startyr`)) +
+ggplot(dat, aes(x=Region, y=`2020`)) +
   ggtitle("Drug-Related Deaths in Scotland", subtitle="Change between 2010 - 2020") +
   geom_linerange(aes(ymin=`2010`,ymax=`2020`), colour='grey', size=1.5) +
   geom_point(aes(y=`2010`), size =1.2, colour='orange') +
