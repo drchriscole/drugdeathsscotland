@@ -776,6 +776,14 @@ ggplot(dat.l, aes(x = year, y = perm, group=Country, colour=Country, linetype = 
 
 ## European Comparison
 
+This data is an attempt to compare the Scotland data with the rest of Europe and
+the UK. It is an attempt as the UK (i.e. the ONS) and EU (i.e. EMCDDA) define
+drug-related deaths slightly differently. The NRS have applied the methodology
+used by the EMCDDA to the Scottish data to get comparable figures.
+
+The current Scottish data is also more up-to-date than the EU's data so a 
+comparison also is made using data covering the same time periods.
+
 ```{r emcdda}
 
 # read data
@@ -791,6 +799,12 @@ dat$Number = as.numeric(dat$Number)
 dat$PerM = as.numeric(dat$PerM)
 #dat.num.l = dat.num %>% gather(Method, Counts, -Year)
 
+# get UK data as it's no longer together with the EU data
+uk = tableEU.dat[46,c(2,4,6)]
+colnames(uk) = c('Country','Number','PerM')
+uk$Country = 'UK'
+uk$PerM = as.numeric(uk$PerM)
+
 # get Scotland data
 scot = tableEU.dat[c(50,52,53),c(2,4,6)]
 colnames(scot) = c('Country','Number','PerM')
@@ -798,17 +812,17 @@ scot$Country = c('Scot - likeUK', 'Scot - likeEU', 'Scot - Newest')
 scot$PerM = as.numeric(scot$PerM)
 
 # join with other data
-dat = rbind(dat, scot)
+dat = rbind(dat, uk, scot)
 
 # fix names
 dat[dat$Country == 'European Union  2', 'Country'] <- 'EU'
 
 # define colour categories
-dat$Category = c(rep('A', 26), 'B', rep('C', 3))
+dat$Category = c(rep('A', 26), 'B', 'A', rep('C', 3))
 
 ggplot(dat, aes(x = fct_reorder(Country,PerM), y = PerM, fill=Category)) + 
   labs(title = "Drug-Related Deaths in Scotland 2020",
-       subtitle = "Comparison with EU countries",
+       subtitle = "Comparison with EU countries (ages 15-64)",
        y = 'Deaths per million population',
        x = '') +
   geom_col() +
