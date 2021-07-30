@@ -34,7 +34,7 @@ myPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2",
 
 # breaks for y-axis line graphs
 
-ybreaks = seq(2001,2020,2)
+ybreaks = seq(2000,2020,2)
 
 # read data - download first as read_excel() can't do URLs
 xlfile = tempfile(fileext = '.xlsx')
@@ -222,8 +222,9 @@ ggplot(dat.sex.m, aes(x=Year, y=value, group=variable, colour=variable)) +
   labs(title = 'Drug-Related Deaths in Scotland',
        subtitle = "Male vs female Deaths",
        x = '',
-       y = "Percentage Deaths") +
-  geom_smooth(method = 'lm', colour = 'grey') +
+       y = "Percentage Deaths",
+       caption = "Trend line: loess") +
+  geom_smooth(method = 'loess', colour = 'grey') +
   geom_line(size=1.2) + 
   ylim(c(10,90)) +
   scale_color_discrete(name='Sex', breaks=c('malpc','fempc'),labels=c('Male','Female')) +
@@ -237,7 +238,7 @@ ggplot(dat.sex.m, aes(x=Year, y=value, group=variable, colour=variable)) +
 
 ```
 
-Males are mostly affected by drug-related deaths, but females are increasing.
+Males are mostly affected by drug-related deaths. Females were increasing, but may have stablised.
 
 ```{r t4c}
 ## get data from lower table
@@ -412,7 +413,7 @@ dat.m = melt(dat, variable.name = "Age")
 ggplot(dat.m, aes(x=Year, y=value, group=Age, colour=Age)) +
   geom_hline(yintercept = yr5mean, colour="grey", linetype="dashed") +
   geom_line(size=1.2) +
-  annotate("text", label="5-year Mean", x=2.5,y=yr5mean+0.02,size=3,colour="grey") +
+  annotate("text", label="5-year Mean", x=2,y=yr5mean+1.5,size=3,colour="grey") +
   scale_x_discrete(breaks=ybreaks) +
   scale_color_manual(values=myPalette) +
   labs(title = "Drug-Related Deaths in Scotland 2020",
