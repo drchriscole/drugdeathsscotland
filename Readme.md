@@ -13,6 +13,7 @@ Starting with the 2018 data there is substantially more regional detail which ma
 Rstudio [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/drchriscole/drugdeathsscotland/master?filepath=rstudio)
 
 This launches a full and working Rstudio environment to run the code interactively.
+Warning: this can take a while to load.
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/drchriscole/drugdeathsscotland/master?filepath=DRD_in_Scotland_Visualisations.Rmd)
 

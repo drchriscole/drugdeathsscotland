@@ -13,7 +13,7 @@ jupyter:
     mimetype: text/x-r-source
     name: R
     pygments_lexer: r
-    version: 3.6.1
+    version: 4.1.0
 ---
 
 ```{r setup, include=FALSE}
