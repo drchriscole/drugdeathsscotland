@@ -32,9 +32,10 @@ reg.colours = c("#4D4D4D", "#AEAEAE")
 # The colour-blind palette with grey:
 myPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#000000")
 
+current_year = 2020
+previous_year = current_year -1
 # breaks for y-axis line graphs
-
-ybreaks = seq(2000,2020,2)
+ybreaks = seq(2000,current_year,2)
 
 # read data - download first as read_excel() can't do URLs
 xlfile = tempfile(fileext = '.xlsx')
@@ -44,11 +45,11 @@ download.file("https://www.nrscotland.gov.uk/files//statistics/drug-related-deat
 
 ```
 
-# Drug-Related Deaths in Scotland 2020 {.tabset}
+# Drug-Related Deaths in Scotland `r current_year` {.tabset}
 
 Annual data is published on drug-related deaths (DRDs) in Scotland by the [National Records of Scotland](https://www.nrscotland.gov.uk/statistics-and-data/statistics/statistics-by-theme/vital-events/deaths/drug-related-deaths-in-scotland). The 2020 data was published on 30th July 2021.
 
-A collection of visualisations of the [2020 data](https://www.nrscotland.gov.uk/files//statistics/drug-related-deaths/20/drug-related-deaths-20-tabs-figs.xlsx) are presented here for those interested in exploring the trends or patterns in the data. Little to no commentary is provided on what the data show.
+A collection of visualisations of the [`r current_year` data](https://www.nrscotland.gov.uk/files//statistics/drug-related-deaths/20/drug-related-deaths-20-tabs-figs.xlsx) are presented here for those interested in exploring the trends or patterns in the data. Little to no commentary is provided on what the data show.
 
 Each table from the data are presented separately by one or more charts. Not all tables are represented here mostly because the data has already been presented in the raw data already.
 
@@ -318,7 +319,7 @@ age.totals = dat.m %>% group_by(Age,Sex) %>% summarise(Total = sum(value))
 
 
 ggplot(dat.m, aes(x=Age, y=value, fill=variable)) +
-  ggtitle("Drug-Related Deaths in Scotland 2019", subtitle="By Sex, Age and Underlying Cause of Death") +
+  ggtitle(sprintf("Drug-Related Deaths in Scotland %d", current_year), subtitle="By Sex, Age and Underlying Cause of Death") +
   ylab('No. Deaths') +
   geom_col() +
   facet_grid(Sex ~ .) +
@@ -436,25 +437,25 @@ table.dat = read_excel(xlfile, sheet = "HB1 - summary", col_names=FALSE)
 
 # extract core data and convert to numbers
 startyr = 2010
-endyr = 2020
 dat = table.dat[14:27,1:12]
-colnames(dat) = c('Region', seq(startyr,endyr,1))
+colnames(dat) = c('Region', seq(startyr,current_year,1))
 dat[dat$Region == 'Highland 3' , 1] = 'Highland'
 dat[dat$Region == 'Greater Glasgow & Clyde 3' , 1] = 'Greater Glasgow & Clyde'
 
-dat$Region = factor(dat$Region, c(dat[order(dat$`2019`),]$Region))
+# order regions by the previous year's data
+dat$Region = factor(dat$Region, c(dat[order(dat[,ncol(dat)-1]),]$Region))
 
 dat.m = melt(dat)
 
-ggplot(dat, aes(x=Region, y=`2020`)) +
-  ggtitle("Drug-Related Deaths in Scotland", subtitle="Change between 2010 - 2020") +
-  geom_linerange(aes(ymin=`2010`,ymax=`2020`), colour='grey', size=1.5) +
+ggplot(dat, aes(x=Region, y=!!as.name(current_year))) +
+  ggtitle("Drug-Related Deaths in Scotland", subtitle=sprintf("Change between 2010 - %d", current_year)) +
+  geom_linerange(aes(ymin=`2010`,ymax=!!as.name(current_year)), colour='grey', size=1.5) +
   geom_point(aes(y=`2010`), size =1.2, colour='orange') +
-  geom_point(aes(y=`2020`), size =1.2, colour='orange') +
-  geom_point(aes(y=`2019`), size =1.2, colour='darkgreen') +
-  geom_text(aes(y=`2019`, label = ifelse(Region == "Greater Glasgow & Clyde", '2019', '')), vjust = 1.4, size=2.2, colour="grey30") +
+  geom_point(aes(y=!!as.name(current_year)), size =1.2, colour='orange') +
+  geom_point(aes(y=!!as.name(previous_year)), size =1.2, colour='darkgreen') +
+  geom_text(aes(y=!!as.name(previous_year), label = ifelse(Region == "Greater Glasgow & Clyde", previous_year, '')), vjust = 1.4, size=2.2, colour="grey30") +
   geom_text(aes(y=`2010`, label = ifelse(Region == "Greater Glasgow & Clyde", '2010', '')), vjust = -0.5, size=2.6, colour="grey30") +
-  geom_text(aes(y=`2020`, label = ifelse(Region == "Greater Glasgow & Clyde", '2020', '')), vjust = -0.5, size=2.6, colour="grey30") +
+  geom_text(aes(y=!!as.name(current_year), label = ifelse(Region == "Greater Glasgow & Clyde", current_year, '')), vjust = -0.5, size=2.6, colour="grey30") +
   ylab('No. Deaths') +
   xlab('') +
   coord_flip() +
@@ -465,11 +466,14 @@ ggplot(dat, aes(x=Region, y=`2020`)) +
 
 ```{r tHBb}
 
-# remove islands as numbers to small
+# remove islands as numbers too small
 #dat = dat[dat$`2017` > 5,]
 
-# do percentage change between 2018 & 2019
-change.dat = data.frame(Region = dat$Region, Change = dat$`2020` - dat$`2019`, PcChange = round(100*(dat$`2020` - dat$`2019`)/dat$`2019`,1))
+# do percentage change between current year and previous
+change.dat = dat %>% 
+  mutate(Change = !!as.name(current_year) - !!as.name(previous_year)) %>% 
+  mutate(PcChange = round(100*Change/!!as.name(previous_year),1)) %>% 
+  select(Region,Change,PcChange)
 
 # remove non-finite data
 change.dat[!is.finite(change.dat$PcChange), 'PcChange'] <- NA
@@ -477,7 +481,7 @@ change.dat[!is.finite(change.dat$PcChange), 'PcChange'] <- NA
 change.dat$Region = factor(change.dat$Region, levels = change.dat[order(change.dat$Change),]$Region)
 
 ggplot(change.dat, aes(x=Region, y=Change, fill="#D55E00")) +
-  labs(title = "Drug-Related Deaths in Scotland 2020", 
+  labs(title = sprintf("Drug-Related Deaths in Scotland %d", current_year), 
        subtitle="Year-on-year change by NHS health board",
        x = '',
        y = "Change in No. Deaths") +
@@ -491,7 +495,7 @@ ggplot(change.dat, aes(x=Region, y=Change, fill="#D55E00")) +
         legend.position = "none")
 
 ggplot(change.dat, aes(x=fct_reorder(Region, PcChange), y=PcChange, fill="#D55E00")) +
-  labs(title = "Drug-Related Deaths in Scotland 2020", 
+  labs(title = sprintf("Drug-Related Deaths in Scotland %d", current_year), 
        subtitle="Year-on-year change by NHS health board",
        x = '',
        y = "Change in Deaths (%)") +
@@ -518,18 +522,17 @@ table.dat = read_excel(xlfile, sheet = "C1 - summary", col_names=FALSE)
 
 # extract core data and convert to numbers
 startyr = 2010
-endyr = 2020
 dat = table.dat[10:41,1:12]
-colnames(dat) = c('Council',seq(startyr,endyr,1))
+colnames(dat) = c('Council',seq(startyr,current_year,1))
 dat$Council = c("Aberdeen", "Aberdeenshire", "Angus", "Argyll & Bute", "Edinburgh", "Clack'shire", "Dumfries & Ga.", "Dundee", "E. Ayrshire", "E. Dunb'shire", "E. Lothian", "E. Renf'shire", "Falkirk", "Fife", "Glasgow", "Highland", "Inverclyde", "Midlothian", "Moray", "Na h-Eil. Siar", "N. Ayrshire", "N. Lanarkshire", "Orkney Islands", "Perth & Kinross", "Renfrewshire", "Scot. Borders", "Shetland Islds", "South Ayrshire", "S. Lanarkshire", "Stirling", "W. Dunb'shire", "West Lothian")
 dat.m = melt(dat)
 
 ggplot(dat.m, aes(x=variable, y=value, group=Council, colour=ifelse(dat.m$Council == "Dundee", "A","B"))) +
-  ggtitle(sprintf("Drug-Related Deaths in Scotland by Council %d-%d",startyr,endyr)) +
+  ggtitle(sprintf("Drug-Related Deaths in Scotland by Council %d-%d",startyr,current_year)) +
   xlab('Year') +
   ylab('No. Deaths') +
   geom_line(size=1.1) +
-  scale_x_discrete(breaks=c(startyr, endyr), labels=c("'10","'20")) +
+  scale_x_discrete(breaks=c(startyr, current_year), labels=c("'10","'20")) +
   scale_colour_manual(values=c('orange','grey')) +
   facet_wrap(~Council) +
   theme_minimal() +
@@ -548,10 +551,10 @@ table.dat = read_excel(xlfile, sheet = "C1 - summary", col_names=FALSE)
 # extract core data and convert to numbers
 dat = table.dat[c(8,10:41),c(1:12,17)]
 dat = data.frame(dat[,1],apply(dat[,2:13], 2, as.numeric))
-names(dat) = c('Council',seq(startyr,endyr),'Pop')
+names(dat) = c('Council',seq(startyr,current_year),'Pop')
 
 # calc DRD rate
-dat = cbind(dat, Rate = 1000000*dat$`2020`/dat$Pop)
+dat = dat %>% mutate(Rate = 1000000  *!!as.name(current_year)/Pop)
 
 # remove whole-of-scotland data
 scot.dat = dat[1,]
@@ -563,7 +566,7 @@ dat$Council = factor(dat$Council, levels=dat[order(dat$Rate),1])
 ggplot(dat, aes(x=Council, y=Rate, fill=factor(ifelse(dat$Council=="Dundee City", "Y","N")))) +
   geom_col() +
   ylim(c(0,490)) +
-  ggtitle(sprintf("Drug-Related Deaths in Scotland %d", endyr), 
+  ggtitle(sprintf("Drug-Related Deaths in Scotland %d", current_year), 
           subtitle = "By council per million population") +
   ylab("Drug-Related Deaths (per million population)") +
   labs(caption="Using 2018 population data") +
@@ -638,7 +641,7 @@ drug_labeller = function(string) {
 
 
 ggplot(dat.pc.m, aes(x=dat.Council, y=value, fill=factor(ifelse(dat.Council=="Dundee", "Y","N")))) +
-  ggtitle("Drugs Implicated in Death in Scotland 2019", subtitle="For councils with >40 deaths") +
+  ggtitle(sprintf("Drugs Implicated in Death in Scotland %d", current_year), subtitle="For councils with >40 deaths") +
   xlab("Council") +
   ylab("Percentage Deaths") +
   geom_col() +
@@ -711,8 +714,8 @@ dat.num.l = dat.num %>% gather(Method, Counts, -Year)
 
 ggplot(dat.num.l, aes(x = Year, y = as.numeric(Counts), group = Method, colour = Method)) +
   geom_line() +
-  geom_point(data = dat.num.l %>% filter(Year == '2020')) +
-  geom_text(data = dat.num.l %>% filter(Year == '2020'), aes(label = as.numeric(Counts)), colour = 'grey4', size = 2.4, hjust = -0.2) +
+  geom_point(data = dat.num.l %>% filter(Year == current_year)) +
+  geom_text(data = dat.num.l %>% filter(Year == current_year), aes(label = as.numeric(Counts)), colour = 'grey4', size = 2.4, hjust = -0.2) +
   scale_color_manual(values = myPalette) +
 #  scale_x_discrete(breaks = ybreaks) +
   labs(title = 'Drug-Related Deaths in Scotland',
@@ -821,7 +824,7 @@ dat[dat$Country == 'European Union  2', 'Country'] <- 'EU'
 dat$Category = c(rep('A', 26), 'B', 'A', rep('C', 3))
 
 ggplot(dat, aes(x = fct_reorder(Country,PerM), y = PerM, fill=Category)) + 
-  labs(title = "Drug-Related Deaths in Scotland 2020",
+  labs(title = sprintf("Drug-Related Deaths in Scotland %d", current_year),
        subtitle = "Comparison with EU countries (ages 15-64)",
        y = 'Deaths per million population',
        x = '') +
