@@ -447,7 +447,7 @@ dat$Region = factor(dat$Region, c(dat[order(dat[,ncol(dat)-1]),]$Region))
 
 dat.m = melt(dat)
 
-ggplot(dat, aes(x=Region, y=!!as.name(current_year))) +
+rplt = ggplot(dat, aes(x=Region, y=!!as.name(current_year))) +
   ggtitle("Drug-Related Deaths in Scotland", subtitle=sprintf("Change between 2010 - %d", current_year)) +
   geom_linerange(aes(ymin=`2010`,ymax=!!as.name(current_year)), colour='grey', size=1.5) +
   geom_point(aes(y=`2010`), size =1.2, colour='orange') +
@@ -462,6 +462,41 @@ ggplot(dat, aes(x=Region, y=!!as.name(current_year))) +
   theme_minimal()
 
 #ggsave('DRD_region_change.png')
+```
+
+
+```{r mapHB}
+library(sf)
+library(ggpubr)
+
+# shapefile data from: https://spatialdata.gov.scot/geonetwork/srv/eng/catalog.search#/metadata/f12c3826-4b4b-40e6-bf4f-77b9ed01dc14
+sg_hb <- st_read('SG_NHS_HealthBoards_2019/SG_NHS_HealthBoards_2019.shp')
+
+sg_hb <- st_simplify(sg_hb, dTolerance = 75)
+#st_geometry_type(sg_hb)
+#st_crs(sg_hb)
+#summary(sg_hb)
+
+# sort regions alphabetically to match the DRD data
+sg_hb_ordered = sg_hb[order(sg_hb$HBName),]
+
+# add most recent deaths data 
+deaths = dat$`2020`
+df = cbind(sg_hb_ordered, deaths = deaths)
+
+tayside = df %>% filter(HBName %in% c("Tayside", "Fife", "Grampian", "Lothian", "Forth Valley"))
+
+mapplt = ggplot(df, aes(fill = deaths)) + 
+  geom_sf(size = 0.4, color = "black") + 
+  scale_fill_continuous(name = "Deaths\nin 2020") +
+  coord_sf() + 
+  theme_void() +
+  theme(legend.position = 'bottom',
+        legend.direction = 'horizontal')
+
+#ggsave('DRD_hb_map.png')
+
+ggarrange(rplt, mapplt, ncol = 2, widths = c(3,1))
 ```
 
 ```{r tHBb}
@@ -511,6 +546,11 @@ ggplot(change.dat, aes(x=fct_reorder(Region, PcChange), y=PcChange, fill="#D55E0
 
 
 ```
+
+```{r mapChange}
+
+```
+
 
 ## Council Comparisons 
 
@@ -839,4 +879,37 @@ ggplot(dat, aes(x = fct_reorder(Country,PerM), y = PerM, fill=Category)) +
 
 
 ```
+
+```{r map, eval=FALSE}
+library(geojsonio)
+library(broom)
+
+spdf <- geojson_read("topo_lad.json",  what = "sp")
+
+# Since it is a bit too much data, I select only a subset of it:
+#spdf <- spdf[ substr(spdf@data$code,1,2)  %in% c("06", "83", "13", "30", "34", "11", "66") , ]
+
+spdf <- spdf[ spdf@data$LAD13NM  %in% c("Fife") , ]
+spdf_fortified <- tidy(spdf, region = "LAD13NM")
+
+# Now I can plot this shape easily as described before:
+ggplot() +
+  geom_polygon(data = spdf_fortified, aes( x = long, y = lat, group = group), fill="white", color="grey") +
+  theme_void() +
+  coord_map()
+
+```
+
+```{r map2, eval=FALSE}
+
+library(eurostat)
+spdf = get_eurostat_geospatial(output_class = 'spdf', nuts_level = '3')
+spdf_UK = spdf[spdf@data[["CNTR_CODE"]] %in% c('UK'), ]
+spdf_UK@data[["NUTS_NAME"]]
+
+
+```
+
+
+
 
