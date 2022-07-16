@@ -25,6 +25,9 @@ library(ggplot2)
 library(dplyr)
 library(forcats)
 library(tidyr)
+library(sf)
+library(ggpubr)
+library(scales)
 
 # default region colours
 reg.colours = c("#4D4D4D", "#AEAEAE")
@@ -465,12 +468,10 @@ rplt = ggplot(dat, aes(x=Region, y=!!as.name(current_year))) +
 ```
 
 
-```{r mapHB}
-library(sf)
-library(ggpubr)
+```{r tHBmap, fig.width=8}
 
 # shapefile data from: https://spatialdata.gov.scot/geonetwork/srv/eng/catalog.search#/metadata/f12c3826-4b4b-40e6-bf4f-77b9ed01dc14
-sg_hb <- st_read('SG_NHS_HealthBoards_2019/SG_NHS_HealthBoards_2019.shp')
+sg_hb <- st_read('SG_NHS_HealthBoards_2019/SG_NHS_HealthBoards_2019.shp', quiet = TRUE)
 
 sg_hb <- st_simplify(sg_hb, dTolerance = 75)
 #st_geometry_type(sg_hb)
@@ -492,14 +493,15 @@ mapplt = ggplot(df, aes(fill = deaths)) +
   coord_sf() + 
   theme_void() +
   theme(legend.position = 'bottom',
-        legend.direction = 'horizontal')
+        legend.direction = 'horizontal',
+        legend.key.size = unit(15, 'points'))
 
 #ggsave('DRD_hb_map.png')
 
 ggarrange(rplt, mapplt, ncol = 2, widths = c(3,1))
 ```
 
-```{r tHBb}
+```{r tHBb, fig.width=8}
 
 # remove islands as numbers too small
 #dat = dat[dat$`2017` > 5,]
@@ -513,15 +515,18 @@ change.dat = dat %>%
 # remove non-finite data
 change.dat[!is.finite(change.dat$PcChange), 'PcChange'] <- NA
 
+# add change data to map
+df = cbind(sg_hb_ordered, Change = change.dat$Change, PcChange = change.dat$PcChange)
+
 change.dat$Region = factor(change.dat$Region, levels = change.dat[order(change.dat$Change),]$Region)
 
-ggplot(change.dat, aes(x=Region, y=Change, fill="#D55E00")) +
+plt1 = ggplot(change.dat, aes(x=Region, y=Change, fill="#D55E00")) +
   labs(title = sprintf("Drug-Related Deaths in Scotland %d", current_year), 
        subtitle="Year-on-year change by NHS health board",
        x = '',
        y = "Change in No. Deaths") +
   geom_col() +
-  ylim(c(-25,40)) +
+  ylim(c(-25,50)) +
   coord_flip() +
   geom_text(aes(label = sprintf("%+d",Change)), hjust = ifelse(change.dat$PcChange > 0, -0.2, 1.1), size=3) +
   theme_minimal() +
@@ -529,26 +534,53 @@ ggplot(change.dat, aes(x=Region, y=Change, fill="#D55E00")) +
         panel.grid.minor.y = element_blank(),
         legend.position = "none")
 
-ggplot(change.dat, aes(x=fct_reorder(Region, PcChange), y=PcChange, fill="#D55E00")) +
+plt2 = ggplot(df, aes(fill = Change)) + 
+  geom_sf(size = 0.4, color = "black") + 
+  scale_fill_gradient2(name = "YoY\nChange", 
+                       low = muted("blue"),
+                       mid = "white",
+                       high = muted("red")) +
+  coord_sf() + 
+  theme_void() +
+  theme(legend.position = 'bottom',
+        legend.direction = 'horizontal',
+        legend.key.size = unit(15, 'points'))
+
+ggarrange(plt1, plt2, ncol = 2, widths = c(3,1))
+
+```
+
+
+```{r tHBc, fig.width=8}
+
+plt1 = ggplot(change.dat, aes(x=fct_reorder(Region, PcChange), y=PcChange, fill="#D55E00")) +
   labs(title = sprintf("Drug-Related Deaths in Scotland %d", current_year), 
        subtitle="Year-on-year change by NHS health board",
        x = '',
        y = "Change in Deaths (%)") +
   geom_col() +
-  ylim(c(-125,210)) +
+  ylim(c(-50,220)) +
   coord_flip() +
-  geom_text(aes(label = sprintf("%+.1f%%",PcChange)), hjust = ifelse(change.dat$PcChange > 0, -0.2, 1.1), size=3) +
+  geom_text(aes(label = sprintf("%+.0f%%",PcChange)), hjust = ifelse(change.dat$PcChange > 0, -0.1, 1.1), size=3) +
   theme_minimal() +
   theme(panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank(),
         legend.position = "none")
 
+plt2 = ggplot(df, aes(fill = PcChange)) + 
+  geom_sf(size = 0.4, color = "black") + 
+  scale_fill_gradient2(name = "YoY\n% Change", 
+                       low = muted("blue"),
+                       mid = "white",
+                       high = muted("red"),
+                       limits = c(-40,100)) +
+  coord_sf() + 
+  theme_void() +
+  theme(legend.position = 'bottom',
+        legend.direction = 'horizontal',
+        legend.key.size = unit(15, 'points'))
 
-
-```
-
-```{r mapChange}
-
+ggarrange(plt1, plt2, ncol = 2, widths = c(3,1))
 ```
 
 
