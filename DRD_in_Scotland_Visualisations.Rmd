@@ -1,7 +1,7 @@
 ---
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 jupyter:
   kernelspec:
     display_name: R
@@ -91,7 +91,7 @@ ggplot(dat.m, aes(x=Year, y=value, fill=variable)) +
         panel.grid.minor = element_blank(),
         legend.title = element_blank())
 
-#ggsave('DRD_cause.png')
+#ggsave('DRD_cause.png', bg = 'white')
 ```
 
 ## Table 3
@@ -147,7 +147,7 @@ ggplot(opiates.m, aes(x=Year, y=value, group=variable, colour=variable)) +
         panel.grid.minor.x = element_blank(),
         legend.title = element_blank())
 
-#ggsave("DRD_implicated_drug1.png")
+#ggsave("DRD_implicated_drug1.png", bg = 'white')
 
 
 # factorise the years to turn into a label and melt
@@ -170,9 +170,7 @@ ggplot(others.m, aes(x=Year, y=value, group=variable, colour=variable)) +
         panel.grid.minor.x = element_blank(),
         legend.title = element_blank())
 
-#ggsave("DRD_implicated_drug2.png")
-
-
+#ggsave("DRD_implicated_drug2.png", bg = 'white')
 ```
 
 NB: data prior to 2008 uses a different definition than the data from 2008. See notes in table 3.
@@ -301,7 +299,7 @@ ggplot(dat.m, aes(x=Year, y=value, fill=variable)) +
         strip.background = element_rect(fill='grey'),
         legend.title = element_blank())
 
-#ggsave("sex_age.png")
+#ggsave("sex_age.png", bg = 'white')
 ```
 
 In 2000 deaths were largely in the under 35s. In 2021 they are dominated by the 35 and over. 
@@ -432,7 +430,7 @@ ggplot(dat.m, aes(x=Year, y=value, group=Age, colour=Age)) +
         panel.grid.minor.x = element_blank())
 
 
-#ggsave('DRD_age_rates.png')
+#ggsave('DRD_age_rates.png', bg = 'white')
 ```
 
 Further evidence that DRDs are an age-related issue.
@@ -470,7 +468,6 @@ rplt = ggplot(dat, aes(x=Region, y=!!as.name(current_year))) +
   coord_flip() +
   theme_minimal()
 
-#ggsave('DRD_region_change.png')
 ```
 
 
@@ -502,9 +499,10 @@ mapplt = ggplot(df, aes(fill = deaths)) +
         legend.direction = 'horizontal',
         legend.key.size = unit(15, 'points'))
 
-#ggsave('DRD_hb_map.png')
-
 ggarrange(rplt, mapplt, ncol = 2, widths = c(3,1))
+
+ggsave('DRD_region_change.png', bg = 'white')
+
 ```
 
 ```{r tHBb, fig.width=8}
@@ -554,6 +552,7 @@ plt2 = ggplot(df, aes(fill = Change)) +
 
 ggarrange(plt1, plt2, ncol = 2, widths = c(3,1))
 
+#ggsave('DRD_YOY_region_change.png', bg = 'white')
 ```
 
 
@@ -587,6 +586,9 @@ plt2 = ggplot(df, aes(fill = PcChange)) +
         legend.key.size = unit(15, 'points'))
 
 ggarrange(plt1, plt2, ncol = 2, widths = c(3,1))
+
+#ggsave('DRD_YOY_pc_region_change.png', bg = 'white')
+
 ```
 
 
@@ -618,6 +620,8 @@ ggplot(dat.m, aes(x=variable, y=value, group=Council, colour=ifelse(dat.m$Counci
         panel.grid.major.y = element_line(colour = 'lightgrey'),
         panel.grid.major.x = element_blank(),
         panel.grid.minor = element_blank())
+
+#ggsave('coucil_multi.png', bg = 'white')
 ```
 
 
@@ -657,7 +661,8 @@ ggplot(dat, aes(x=Council, y=`2021`, fill=factor(ifelse(dat$Council=="Dundee Cit
   theme(panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank(),
         legend.position = "none")
-#ggsave("TableC1.png")
+
+#ggsave("council_5yr_rate.png", bg = 'white')
 ```
 
 
@@ -731,7 +736,8 @@ ggplot(dat.pc.m, aes(x=dat.Council, y=value, fill=factor(ifelse(dat.Council=="Du
   theme_minimal() +
   theme(strip.text.y = element_text(angle = 0),
         legend.position = "none")
-#ggsave("DRD_implicated_drug.png", height = 10, width= 8, units = 'in', dpi=150)
+
+#ggsave("DRD_council_implicated_drug.png", height = 10, width= 8, units = 'in', dpi=150, bg = 'white')
 
 ```
 
@@ -770,7 +776,8 @@ ggplot(dat.m, aes(x=variable, y=value, group=Council, colour=ifelse(Council == "
   theme_minimal() +
   theme(strip.text.y = element_text(angle=0),
         legend.position = "none")
-#ggsave("DRD_age_group.png", height = 6, width= 6, units = 'in', dpi=150)
+
+#ggsave("DRD_council_age_group.png", height = 6, width= 6, units = 'in', dpi=150, bg = 'white')
 ```
 
 ## Different Definitions
@@ -800,7 +807,7 @@ ggplot(dat.num.l, aes(x = Year, y = as.numeric(Counts), group = Method, colour =
         panel.grid.minor.x = element_blank(),
         legend.title = element_blank())
 
-
+#ggsave('DRD_diff_defns.png', bg = 'white')
 ```
 
 
@@ -884,9 +891,9 @@ gb$Country = 'GB'
 gb$PerM = as.numeric(gb$PerM)
 
 # get Scotland data
-scot = tableEU.dat[c(50:52),c(2,4,6)]
+scot = tableEU.dat[c(50,52),c(2,4,6)]
 colnames(scot) = c('Country','Number','PerM')
-scot$Country = c('Scot - likeGB', 'Scot - likeEU', 'Scot - Newest')
+scot$Country = c('Scot - likeGB', 'Scot - likeEU')
 scot$PerM = as.numeric(scot$PerM)
 
 # join with other data
@@ -896,7 +903,7 @@ dat = rbind(dat, gb, scot)
 dat[dat$Country == 'European Union  2', 'Country'] <- 'EU'
 
 # define colour categories
-dat$Category = c(rep('A', 26), 'B', 'A', rep('C', 3))
+dat$Category = c(rep('A', 26), 'B', 'A', rep('C', 2))
 
 ggplot(dat, aes(x = fct_reorder(Country,PerM), y = PerM, fill=Category)) + 
   labs(title = sprintf("Drug-Related Deaths in Scotland 2020", current_year),
@@ -913,6 +920,6 @@ ggplot(dat, aes(x = fct_reorder(Country,PerM), y = PerM, fill=Category)) +
         panel.grid.minor.y = element_blank(),
         legend.position = 'NA')
 
-
+#ggsave('DRD_EMCDDA_comparison.png', bg = 'white')
 ```
 
