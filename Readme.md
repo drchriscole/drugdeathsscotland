@@ -1,6 +1,6 @@
 [![DOI](https://zenodo.org/badge/100367876.svg)](https://zenodo.org/badge/latestdoi/100367876)
 
-![headline_image](https://raw.githubusercontent.com/drchriscole/drugdeathsscotland/blob/2021_data/DRD_region_change.png)
+![headline_image](https://raw.githubusercontent.com/drchriscole/drugdeathsscotland/2021_data/DRD_region_change.png)
 
 # Drug-related deaths in Scotland
 
